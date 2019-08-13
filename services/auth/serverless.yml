@@ -1,0 +1,55 @@
+service: wps-auth
+
+plugins:
+  - aws-amplify-serverless-plugin
+  - serverless-webpack
+
+provider:
+  deploymentBucket:
+    name: ${file(../../config.yml):deploymentBucket, 'wps-devops'}
+  name: aws
+  runtime: nodejs8.10
+  region: ${opt:region, 'us-west-2'}
+
+package:
+  individually: true
+
+functions:
+  pre_signup:
+    handler: functions/pre_signup/index.handler
+    role: PreSignupRole
+    events:
+      - cognitoUserPool:
+          pool: MyUserPool
+          trigger: PreSignUp
+    environment:
+      TABLE_USERS: ${cf:wps-db-${self:custom.stage}.DynamoTableUsers}
+      # STRIPE_SECRET_KEY: ${ssm:wps-${self:custom.stage}-stripeSecretKey}
+  #welcome_email:
+  #  handler: functions/welcome_email/index.handler
+  #  role: WelcomeEmailRole
+  #  events:
+  #    - schedule: rate(10 minutes)
+  #  environment:
+  #    SENDGRID_API_KEY: ${ssm:wps-${self:custom.stage}-sendgridApiKey}
+  #    SENDGRID_TEMPLATE_WELCOME_TRIAL: ${ssm:wps-${self:custom.stage}-sendgridTemplateWelcomeTrial}
+  #    SENDGRID_TEMPLATE_WELCOME_SUBSCRIBER: ${ssm:wps-${self:custom.stage}-sendgridTemplateWelcomeSubscriber}
+  #    TABLE_USERS: ${cf:wps-db-${self:custom.stage}.DynamoTableUsers}
+
+custom:
+  stage: ${opt:stage}
+
+  amplify:
+    # Android
+    - filename: ./.serverless/amplify-android-awsconfiguration.json
+      type: native
+      appClient: UserPoolClientAndroid
+
+    # iOS
+    - filename: ./.serverless/amplify-ios-awsconfiguration.json
+      type: native
+      appClient: UserPoolClientiOS
+
+resources:
+  - ${file(resources/cognito.yml)}
+  - ${file(resources/iam.yml)}

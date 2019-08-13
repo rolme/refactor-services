@@ -1,0 +1,17 @@
+{
+  "name": "auth",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Refactor Auth Service",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^1.36.3",
+    "serverless-webpack": "^5.2.0"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
+    "@types/stripe": "^6.25.10",
+    "aws-sdk": "^2.437.0",
+    "stripe": "^6.28.0"
+  }
+}

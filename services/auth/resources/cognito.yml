@@ -1,0 +1,174 @@
+Resources:
+  CognitoUserPoolMyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:service}-${self:custom.stage}-UserPool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+
+  UserPoolClientAndroid:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientAndroid
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+
+  UserPoolClientiOS:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientiOS
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+
+  UserPoolClientWeb:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientWeb
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+
+  UserPoolClientJest:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientJest
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+
+  UserPoolClientMigration:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientMigration
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+
+  UserPoolClientPlayground:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientPlayground
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+
+  UserPoolClientCheckout:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientCheckout
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+
+  UserPoolClientCli:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientCli
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+
+  CognitoIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: ${self:custom.stage}IdentityPool
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders:
+        - ClientId:
+            Ref: UserPoolClientAndroid
+          ProviderName:
+            Fn::GetAtt:
+              - CognitoUserPoolMyUserPool
+              - ProviderName
+        - ClientId:
+            Ref: UserPoolClientiOS
+          ProviderName:
+            Fn::GetAtt:
+              - CognitoUserPoolMyUserPool
+              - ProviderName
+        - ClientId:
+            Ref: UserPoolClientCli
+          ProviderName:
+            Fn::GetAtt:
+              - CognitoUserPoolMyUserPool
+              - ProviderName
+
+  IdentityPoolRoles:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId:
+        Ref: CognitoIdentityPool
+      Roles:
+        authenticated:
+          Fn::GetAtt: [AuthenticatedUserRole, Arn]
+
+  AuthenticatedUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action:
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud:
+                  Ref: CognitoIdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+      Policies:
+        - PolicyName: AuthorizedUserPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - mobileanalytics:PutEvents
+                  - cognito-sync:*
+                  - cognito-identity:*
+                Resource: '*'
+              - Effect: 'Allow'
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - Fn::Join:
+                      - ''
+                      - - 'arn:aws:s3:::'
+                        - ${cf:wps-storage-${self:custom.stage}.UploadBucket}
+                        - '/*'
+
+Outputs:
+  UserPool:
+    Value:
+      Ref: CognitoUserPoolMyUserPool
+  UserPoolClientPlayground:
+    Value:
+      Ref: UserPoolClientPlayground
+  UserPoolClientJest:
+    Value:
+      Ref: UserPoolClientJest
+  IdentityPool:
+    Value:
+      Ref: CognitoIdentityPool

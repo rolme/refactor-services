@@ -1,0 +1,13 @@
+service: wps-db
+
+provider:
+  deploymentBucket:
+    name: ${file(../../config.yml):deploymentBucket, 'refactor-devops'}
+  name: aws
+  region: ${opt:region, 'us-west-2'}
+
+custom:
+  stage: ${opt:stage}
+
+resources:
+  - ${file(resources/dynamo.yml)}

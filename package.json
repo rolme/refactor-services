@@ -1,16 +1,19 @@
 {
-  "name": "refactor-serverless",
-  "version": "1.0.0",
-  "description": "",
-  "main": "graphql.js",
-  "dependencies": {
-    "apollo-server-lambda": "^2.6.1",
-    "graphql": "^14.3.1"
-  },
-  "devDependencies": {},
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "tests"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "bin/deploy.sh",
+    "info": "bin/info.sh",
+    "remove": "bin/remove.sh",
+    "test": "jest"
   },
-  "author": "",
-  "license": "ISC"
+  "resolutions": {
+    "jest-cli": "24.5.0"
+  },
+  "jest": {
+    "testRunner": "jest-circus/runner"
+  }
 }

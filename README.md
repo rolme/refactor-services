@@ -1,3 +1,9 @@
+# Environment
+You will need the following installed:
+```
+$ npm install -g yo generator-serverless-policy serverless
+```
+You will need aws-cli
 # Deployment
 ## Packaging
 ```

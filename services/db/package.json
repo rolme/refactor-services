@@ -1,0 +1,10 @@
+{
+  "name": "db",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Refactor Database Service",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^1.36.3"
+  }
+}

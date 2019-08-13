@@ -1,0 +1,26 @@
+{
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "linterOptions": {
+    "exclude": [".serverless", "**/node_modules/**/*"]
+  },
+  "rules": {
+    "file-name-casing": [true, "kebab-case"],
+    "indent": [true, "spaces", 2],
+    "jsx-boolean-value": [true, "never"],
+    "jsx-no-lambda": false,
+    "no-console": [true, "error", "info", "warn"],
+    "no-empty-interface": false,
+    "no-implicit-dependencies": [true, "dev"],
+    "no-submodule-imports": [true, "@aws"],
+    "ordered-imports": [
+      true,
+      {
+        "grouped-imports": false,
+        "import-sources-order": "case-insensitive",
+        "module-source-path": "full",
+        "named-imports-order": "case-insensitive"
+      }
+    ],
+    "quotemark": [true, "single"]
+  }
+}

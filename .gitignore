@@ -1,2 +1,12 @@
-node_modules
+*.pyc
+.DS_Store
+.build
 .serverless
+.venv*
+.webpack
+__pycache__
+awsconfig
+node_modules
+amplify
+/config.yml
+exports.yml

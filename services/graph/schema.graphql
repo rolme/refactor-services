@@ -1,0 +1,114 @@
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+enum AccountState {
+  FREE_TRIAL
+  ACTIVE_SUBSCRIBER
+  EXPIRING_SUBSCRIBER
+  EXPIRED
+}
+
+type S3Object @aws_cognito_user_pools @aws_api_key {
+  bucket: String!
+  key: String!
+  region: String!
+  mimeType: String!
+}
+
+type Address @aws_cognito_user_pools @aws_api_key {
+  country: String
+  locality: String
+  postalCode: String
+  region: String
+  street: [String]
+}
+
+type Profile @aws_cognito_user_pools @aws_api_key {
+  address: Address
+  email: String
+  phone: String
+  title: String
+  website: String
+  # TODO: add Social Media
+}
+
+type User {
+  avatar: S3Object @aws_cognito_user_pools @aws_api_key
+  admin: Boolean!
+  confirmedAt: Date
+  createdAt: Date!
+  email: String!
+  disabled: Boolean
+  expiresAt: Date
+  habits: [Habit]
+  id: ID! @aws_cognito_user_pools @aws_api_key
+  name: String @aws_cognito_user_pools @aws_api_key
+  profile: Profile @aws_cognito_user_pools @aws_api_key
+  resetAt: Date
+  resetToken: String
+  state: AccountState!
+  updatedAt: Date!
+}
+
+type Category {
+  id: ID!
+  name: String!
+}
+
+type Habit {
+  category: Category 
+  createdAt: Date!
+  deletedAt: Date
+  description: String!
+  enableWeekends: Boolean
+  place: String
+  tasks: [Task]
+  time: String!
+  trigger: String
+  updatedAt: Date!
+  user: User!
+  why: String
+}
+
+type Task {
+  habit: Habit!
+  version: String
+  completionDate: Date
+  completed: Boolean
+  createdAt: Date!
+  difficulty: Integer
+  rating: Integer
+  updatedAt: Date!
+}
+
+type Query {
+  getUser: User
+  getHabit: Habit
+  getHabits: [Habit]
+  getTask: Task
+  getTasks: [Task]
+}
+
+type Mutation {
+  deleteUser: User!
+  updateUser(
+    email: String
+    name: String
+    profile: Profile
+    avatar: S3Object
+  ): User!
+}
+
+type Subscription {
+  onDeleteUser: User @aws_subscribe(mutations: ["deleteUser"])
+  onUpdateUser: User @aws_subscribe(mutations: ["updateUser"])
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}

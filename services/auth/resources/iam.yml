@@ -1,0 +1,102 @@
+Resources:
+  PreSignupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:service}-${self:custom.stage}-PreSignupRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ${self:service}-${self:custom.stage}-PreSignupCloudwatchPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:logs
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - log-group:/aws/lambda/${self:service}-${self:custom.stage}-pre_signup:*:*
+
+        - PolicyName: ${self:service}-${self:custom.stage}-PreSignupDynamoPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:wps-db-${self:custom.stage}.DynamoTableUsers}
+
+  WelcomeEmailRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:service}-${self:custom.stage}-WelcomeEmailRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ${self:service}-${self:custom.stage}-WelcomeEmailCloudwatchPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:logs
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - log-group:/aws/lambda/${self:service}-${self:custom.stage}-welcome_email:*:*
+
+        - PolicyName: ${self:service}-${self:custom.stage}-WelcomeEmailDynamoPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Query
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:wps-db-${self:custom.stage}.DynamoTableUsers}/index/WelcomeEmailPendingIndex
+              - Effect: Allow
+                Action:
+                  - dynamodb:UpdateItem
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:wps-db-${self:custom.stage}.DynamoTableUsers}
