@@ -15,14 +15,6 @@ Resources:
           RequireSymbols: false
           RequireUppercase: false
 
-  UserPoolClientAndroid:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientAndroid
-      GenerateSecret: false
-      UserPoolId:
-        Ref: CognitoUserPoolMyUserPool
-
   UserPoolClientiOS:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -43,16 +35,6 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       ClientName: ${self:service}-${self:custom.stage}-UserPoolClientJest
-      GenerateSecret: false
-      UserPoolId:
-        Ref: CognitoUserPoolMyUserPool
-      ExplicitAuthFlows:
-        - ADMIN_NO_SRP_AUTH
-
-  UserPoolClientMigration:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientMigration
       GenerateSecret: false
       UserPoolId:
         Ref: CognitoUserPoolMyUserPool
@@ -92,12 +74,6 @@ Resources:
       AllowUnauthenticatedIdentities: false
       CognitoIdentityProviders:
         - ClientId:
-            Ref: UserPoolClientAndroid
-          ProviderName:
-            Fn::GetAtt:
-              - CognitoUserPoolMyUserPool
-              - ProviderName
-        - ClientId:
             Ref: UserPoolClientiOS
           ProviderName:
             Fn::GetAtt:
@@ -105,6 +81,12 @@ Resources:
               - ProviderName
         - ClientId:
             Ref: UserPoolClientCli
+          ProviderName:
+            Fn::GetAtt:
+              - CognitoUserPoolMyUserPool
+              - ProviderName
+        - ClientId:
+            Ref: UserPoolClientWeb
           ProviderName:
             Fn::GetAtt:
               - CognitoUserPoolMyUserPool
@@ -156,7 +138,7 @@ Resources:
                   - Fn::Join:
                       - ''
                       - - 'arn:aws:s3:::'
-                        - ${cf:wps-storage-${self:custom.stage}.UploadBucket}
+                        - ${cf:refactor-storage-${self:custom.stage}.UploadBucket}
                         - '/*'
 
 Outputs:

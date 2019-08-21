@@ -1,0 +1,170 @@
+Resources:
+  AppSyncRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:service}-${self:custom.stage}-AppSyncRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+                - dynamodb.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ${self:service}-${self:custom.stage}-AppSyncDynamoPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:DescribeTable
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}/*
+
+  AppSyncCloudwatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:service}-${self:custom.stage}-AppSyncCloudwatchRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ${self:service}-${self:custom.stage}-AppSyncCloudwatchPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - '*'
+
+  GraphResolverRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:service}-${self:custom.stage}-GraphResolverRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - appsync.amazonaws.com
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ${self:service}-${self:custom.stage}-GraphResolverLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:lambda
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - function:${self:service}-${self:custom.stage}-GraphqlLambda
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:lambda
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - function:refactor-media-${self:custom.stage}-thumbnails
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:lambda
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - function:refactor-media-${self:custom.stage}-delete_files
+
+        - PolicyName: ${self:service}-${self:custom.stage}-GraphResolverCloudwatchPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - '*'
+
+        - PolicyName: ${self:service}-${self:custom.stage}-GraphResolverDynamoPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:DescribeTable
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                Resource:
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}
+                  - Fn::Join:
+                      - ':'
+                      - - arn:aws:dynamodb
+                        - Ref: AWS::Region
+                        - Ref: AWS::AccountId
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}/*
+
+        - PolicyName: ${self:service}-${self:custom.stage}-GraphResolverCognitoPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:adminDeleteUser
+                  - cognito-idp:adminUserGlobalSignOut
+                  - cognito-idp:adminUpdateUserAttributes
+                Resource:
+                  Fn::Join:
+                    - ':'
+                    - - arn:aws:cognito-idp
+                      - Ref: AWS::Region
+                      - Ref: AWS::AccountId
+                      - userpool/${cf:refactor-auth-${self:custom.stage}.UserPool}

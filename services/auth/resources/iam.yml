@@ -43,7 +43,7 @@ Resources:
                       - - arn:aws:dynamodb
                         - Ref: AWS::Region
                         - Ref: AWS::AccountId
-                        - table/${cf:wps-db-${self:custom.stage}.DynamoTableUsers}
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}
 
   WelcomeEmailRole:
     Type: AWS::IAM::Role
@@ -89,7 +89,7 @@ Resources:
                       - - arn:aws:dynamodb
                         - Ref: AWS::Region
                         - Ref: AWS::AccountId
-                        - table/${cf:wps-db-${self:custom.stage}.DynamoTableUsers}/index/WelcomeEmailPendingIndex
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}/index/WelcomeEmailPendingIndex
               - Effect: Allow
                 Action:
                   - dynamodb:UpdateItem
@@ -99,4 +99,4 @@ Resources:
                       - - arn:aws:dynamodb
                         - Ref: AWS::Region
                         - Ref: AWS::AccountId
-                        - table/${cf:wps-db-${self:custom.stage}.DynamoTableUsers}
+                        - table/${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}

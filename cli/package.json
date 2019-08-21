@@ -1,0 +1,42 @@
+{
+  "author": "roland.parnaso@gmail.com",
+  "bin": {
+    "rtb": "./.build/index.js",
+    "refactor-toolbelt": "./.build/index.js"
+  },
+  "main": "index.js",
+  "name": "refactor-toolbelt",
+  "license": "MIT",
+  "dependencies": {
+    "aws-amplify": "^1.1.36",
+    "axios": "^0.19.0",
+    "chalk": "^2.4.2",
+    "commander": "^3.0.0",
+    "core-js": "^3.2.1",
+    "dotenv": "^8.1.0",
+    "faker": "^4.1.0",
+    "graphql-request": "^1.8.2",
+    "inquirer": "^6.5.1",
+    "lodash": "^4.17.15",
+    "uuid": "^3.3.2",
+    "validator": "^11.1.0"
+  },
+  "description": "Command line interface for Refactor Services",
+  "devDependencies": {
+    "@aws-amplify/auth": "^1.2.31",
+    "@types/core-js": "^2.5.2",
+    "@types/dotenv": "^6.1.1",
+    "@types/faker": "^4.1.5",
+    "@types/graphql": "^14.2.3",
+    "@types/inquirer": "^6.5.0",
+    "@types/lodash": "^4.14.137",
+    "@types/uuid": "^3.4.5",
+    "@types/validator": "^10.11.2",
+    "prettier": "^1.18.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.3"
+  },
+  "version": "0.0.1"
+}

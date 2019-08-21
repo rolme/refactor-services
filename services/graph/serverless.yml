@@ -1,0 +1,108 @@
+service: refactor-graph
+
+plugins:
+  - serverless-webpack
+  - serverless-appsync-plugin
+
+provider:
+  deploymentBucket:
+    name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
+  name: aws
+  runtime: nodejs8.10
+  region: ${opt:region, 'us-west-2'}
+
+package:
+  individually: true
+
+functions:
+  graphql:
+    handler: handler.graphqlHandler
+    name: ${self:service}-${self:custom.stage}-GraphqlLambda
+    role: GraphResolverRole
+    environment:
+      TABLE_REFACTOR: ${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}
+      USER_POOL_ID: ${cf:refactor-auth-${self:custom.stage}.UserPool}
+      UPLOAD_BUCKET: ${cf:refactor-storage-${self:custom.stage}.UploadBucket}
+      LAMBDA_DELETE_FILES: refactor-media-${self:custom.stage}-delete_files
+    timeout: 30
+
+custom:
+  stage: ${opt:stage}
+
+  amplify:
+    # Graph types
+    - filename: ./src/types/schema.ts
+      type: appsync
+      maxDepth: 12
+
+  appSync:
+    name: refactor-${self:custom.stage}
+
+    authenticationType: AMAZON_COGNITO_USER_POOLS
+
+    logConfig:
+      loggingRoleArn:
+        Fn::GetAtt:
+          - AppSyncCloudwatchRole
+          - Arn
+      level: ALL
+
+    userPoolConfig:
+      awsRegion:
+        Ref: AWS::Region
+      defaultAction: ALLOW
+      playgroundClientId: ${cf:refactor-auth-${self:custom.stage}.UserPoolClientPlayground}
+      userPoolId: ${cf:refactor-auth-${self:custom.stage}.UserPool}
+
+    additionalAuthenticationProviders:
+      - authenticationType: API_KEY
+
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: DynamoTableRefactor
+        config:
+          tableName: ${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}
+          serviceRoleArn:
+            Fn::GetAtt:
+              - AppSyncRole
+              - Arn
+      - type: AWS_LAMBDA
+        name: LambdaResolver
+        config:
+          lambdaFunctionArn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:lambda
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - function:${self:service}-${self:custom.stage}-GraphqlLambda
+          serviceRoleArn:
+            Fn::GetAtt:
+              - GraphResolverRole
+              - Arn
+      - type: NONE
+        name: EmptyResolver
+
+    mappingTemplates:
+      # Queries
+      - dataSource: LambdaResolver
+        type: Query
+        field: getUser
+        request: getUser-request.vtl
+        response: json-response.vtl
+
+      # Mutations
+      - dataSource: LambdaResolver
+        type: Mutation
+        field: updateUser
+        request: updateUser-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
+        field: deleteUser
+        request: deleteUser-request.vtl
+        response: json-response.vtl
+      # Nested Resolvers
+
+resources:
+  - ${file(resources/iam.yml)}

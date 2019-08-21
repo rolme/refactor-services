@@ -1,8 +1,4 @@
-
-enum SortOrder {
-  ASC
-  DESC
-}
+##### Enumarations
 
 enum AccountState {
   FREE_TRIAL
@@ -11,12 +7,37 @@ enum AccountState {
   EXPIRED
 }
 
-type S3Object @aws_cognito_user_pools @aws_api_key {
+enum SortOrder {
+  ASC
+  DESC
+}
+
+##### Inputs
+
+input AddressInput {
+  country: String
+  locality: String
+  postalCode: String
+  region: String
+  street: [String]!
+}
+
+input ProfileInput {
+  address: AddressInput
+  email: String
+  title: String
+  website: String
+}
+
+input S3ObjectInput {
   bucket: String!
   key: String!
-  region: String!
+  localUri: String
   mimeType: String!
+  region: String!
 }
+
+##### Types
 
 type Address @aws_cognito_user_pools @aws_api_key {
   country: String
@@ -24,6 +45,36 @@ type Address @aws_cognito_user_pools @aws_api_key {
   postalCode: String
   region: String
   street: [String]
+}
+
+type Category {
+  id: ID!
+  name: String!
+}
+
+type Habit {
+  category: Category
+  createdAt: String!
+  deletedAt: String
+  description: String!
+  enableWeekends: Boolean
+  place: String
+  tasks: [Task]
+  time: String!
+  trigger: String
+  updatedAt: String!
+  user: User!
+  why: String
+}
+
+type Mutation {
+  deleteUser: User!
+  updateUser(
+    email: String
+    name: String
+    profile: ProfileInput
+    avatar: S3ObjectInput
+  ): User!
 }
 
 type Profile @aws_cognito_user_pools @aws_api_key {
@@ -35,53 +86,47 @@ type Profile @aws_cognito_user_pools @aws_api_key {
   # TODO: add Social Media
 }
 
+type S3Object @aws_cognito_user_pools @aws_api_key {
+  bucket: String!
+  key: String!
+  region: String!
+  mimeType: String!
+}
+
+type Subscription {
+  onDeleteUser: User @aws_subscribe(mutations: ["deleteUser"])
+  onUpdateUser: User @aws_subscribe(mutations: ["updateUser"])
+}
+
 type User {
-  avatar: S3Object @aws_cognito_user_pools @aws_api_key
   admin: Boolean!
-  confirmedAt: Date
-  createdAt: Date!
-  email: String!
+  avatar: S3Object @aws_cognito_user_pools @aws_api_key
+  confirmedAt: String
+  createdAt: String!
   disabled: Boolean
-  expiresAt: Date
+  email: String!
+  expiresAt: String
   habits: [Habit]
   id: ID! @aws_cognito_user_pools @aws_api_key
   name: String @aws_cognito_user_pools @aws_api_key
   profile: Profile @aws_cognito_user_pools @aws_api_key
-  resetAt: Date
+  resetAt: String
   resetToken: String
-  state: AccountState!
-  updatedAt: Date!
-}
-
-type Category {
-  id: ID!
-  name: String!
-}
-
-type Habit {
-  category: Category 
-  createdAt: Date!
-  deletedAt: Date
-  description: String!
-  enableWeekends: Boolean
-  place: String
-  tasks: [Task]
-  time: String!
-  trigger: String
-  updatedAt: Date!
-  user: User!
-  why: String
+  sort: String
+  status: AccountState!
+  updatedAt: String!
+  welcomeEmailPending: String
 }
 
 type Task {
   habit: Habit!
   version: String
-  completionDate: Date
+  completionDate: String
   completed: Boolean
-  createdAt: Date!
-  difficulty: Integer
-  rating: Integer
-  updatedAt: Date!
+  createdAt: String!
+  difficulty: Int
+  rating: Int
+  updatedAt: String!
 }
 
 type Query {
@@ -92,20 +137,7 @@ type Query {
   getTasks: [Task]
 }
 
-type Mutation {
-  deleteUser: User!
-  updateUser(
-    email: String
-    name: String
-    profile: Profile
-    avatar: S3Object
-  ): User!
-}
-
-type Subscription {
-  onDeleteUser: User @aws_subscribe(mutations: ["deleteUser"])
-  onUpdateUser: User @aws_subscribe(mutations: ["updateUser"])
-}
+##### Schema
 
 schema {
   query: Query

@@ -28,7 +28,7 @@ async function updatePendingFlag(userId: string) {
   console.log('removing welcomeEmailPending for user', userId);
   return ddb
     .update({
-      TableName: process.env.TABLE_USERS!,
+      TableName: process.env.TABLE_REFACTOR!,
       Key: {
         id: userId,
       },
@@ -45,7 +45,7 @@ export const handler = async (event: any = {}): Promise<any> => {
 
   const users = await ddb
     .query({
-      TableName: process.env.TABLE_USERS!,
+      TableName: process.env.TABLE_REFACTOR!,
       IndexName: 'WelcomeEmailPendingIndex',
       KeyConditionExpression: '#KEY1 = :value1',
       FilterExpression: '#KEY2 < :value2',

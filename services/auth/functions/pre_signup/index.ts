@@ -15,23 +15,20 @@ async function addUserToDdb(
   const now = new Date().getTime();
 
   const data: { [key: string]: any } = {
-    id: userName,
-    email: email,
+    email,
     expiresAt: expiresAt.getTime(),
+    id: `USER-${userName}`,
     updatedAt: now,
   };
 
-  if (createdAt) {
-    data.createdAt = createdAt;
-  } else {
-    data.createdAt = now;
-  }
+  data.createdAt = createdAt ? createdAt : now;
+  data.sort = `USER-${email}-${data.createdAt}`;
 
   console.log('inserting ddb record:', data);
 
   return ddb
     .put({
-      TableName: process.env.TABLE_USERS!,
+      TableName: process.env.TABLE_REFACTOR!,
       Item: data,
     })
     .promise()

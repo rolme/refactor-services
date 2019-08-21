@@ -1,0 +1,72 @@
+Resources:
+  UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Id: Expire
+            Status: Enabled
+            ExpirationInDays: 7
+
+  MediaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'
+            AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+            MaxAge: 3000
+
+  S3BucketUploadPermissions:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: UploadBucket
+      PolicyDocument:
+        Statement:
+          - Principal: '*'
+            Action:
+              - s3:GetObject
+            Effect: Allow
+            Sid: PublicReadForGetBucketObjects
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - Fn::GetAtt: [UploadBucket, Arn]
+                    - '/*'
+
+  S3BucketMediaPermissions:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: MediaBucket
+      PolicyDocument:
+        Statement:
+          - Principal: '*'
+            Action:
+              - s3:GetObject
+            Effect: Allow
+            Sid: PublicReadForGetBucketObjects
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - Fn::GetAtt: [MediaBucket, Arn]
+                    - '/*'
+
+Outputs:
+  UploadBucket:
+    Value:
+      Ref: UploadBucket
+  UploadBucketRegion:
+    Value:
+      Ref: AWS::Region
+  MediaBucket:
+    Value:
+      Ref: MediaBucket
+  MediaBucketRegion:
+    Value:
+      Ref: AWS::Region

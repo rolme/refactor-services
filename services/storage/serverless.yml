@@ -1,4 +1,4 @@
-service: refactor-db
+service: refactor-storage
 
 provider:
   deploymentBucket:
@@ -10,4 +10,4 @@ custom:
   stage: ${opt:stage}
 
 resources:
-  - ${file(resources/dynamo.yml)}
+  - ${file(resources/s3.yml)}
