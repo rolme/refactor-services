@@ -5,6 +5,7 @@
   "description": "Refactor Auth Service",
   "license": "ISC",
   "devDependencies": {
+    "@types/validator": "^10.11.3",
     "serverless": "^1.36.3",
     "serverless-webpack": "^5.2.0"
   },
@@ -12,6 +13,7 @@
     "@sendgrid/mail": "^6.3.1",
     "@types/stripe": "^6.25.10",
     "aws-sdk": "^2.437.0",
-    "stripe": "^6.28.0"
+    "stripe": "^6.28.0",
+    "validator": "^11.1.0"
   }
 }

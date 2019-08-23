@@ -49,7 +49,7 @@ export async function update(
     const UserAttributes = [
       {
         Name: 'email',
-        Value: event.context.arguments.email,
+        Value: event.context.arguments.email.toLowerCase(),
       },
       {
         Name: 'email_verified',
