@@ -1,12 +1,12 @@
 import { DynamoDB } from 'aws-sdk';
+import * as validator from 'validator';
 
 const ddb = new DynamoDB.DocumentClient();
 
 async function addUserToDdb(
   userName: string,
-  email: string,
+  email: string, // Email coming from end-user will be case-incensitive
   customerId: string,
-  createdAt: number | undefined,
 ) {
   // Set expiration date 14 days from now
   const expiresAt = new Date();
@@ -15,48 +15,46 @@ async function addUserToDdb(
   const now = new Date().getTime();
 
   const data: { [key: string]: any } = {
+    data: email.toLowerCase(),
     email,
     expiresAt: expiresAt.getTime(),
     id: `USER-${userName}`,
     updatedAt: now,
   };
 
-  data.createdAt = createdAt ? createdAt : now;
-  data.sort = `USER-${email}-${data.createdAt}`;
+  data.createdAt = now;
+  data.sort = `${email.toLowerCase()}|${data.createdAt}`;
 
   console.log('inserting ddb record:', data);
 
   return ddb
     .put({
-      TableName: process.env.TABLE_REFACTOR!,
       Item: data,
+      TableName: process.env.TABLE_REFACTOR!,
     })
     .promise()
     .catch((error) => console.log(error.toString()));
 }
 
 export const handler = async (event: any = {}): Promise<any> => {
-  console.log('event:', event);
+  const email = event.request.userAttributes.email;
 
-  let migration;
-  let createdAt;
-
-  if (event.request.validationData && event.request.validationData.migration) {
-    console.log('migration user:', event.userName);
-    migration = JSON.parse(event.request.validationData.migration);
-    console.log('migration data:', migration);
+  if (email !== email.toLowerCase()) {
+    throw new Error('Email must be lower case');
   }
 
-  if (migration && migration.createdAt) {
-    createdAt = migration.createdAt;
+  if (!validator.isEmail(email)) {
+    throw new Error('Email is invalid');
   }
 
-  await addUserToDdb(
-    event.userName,
-    event.request.userAttributes.email,
-    'none',
-    createdAt,
-  );
+  let rawEmail = email;
+
+  console.log('event:', event.request.validationData);
+  if (event.request.validationData) {
+    rawEmail = event.request.validationData.rawEmail;
+  }
+
+  await addUserToDdb(event.userName, rawEmail, 'none');
 
   // Auto confirm all users
   console.log('autoconfirming user:', event.userName);

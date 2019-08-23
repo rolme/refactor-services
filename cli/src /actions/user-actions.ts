@@ -49,7 +49,7 @@ class UserActions {
 
   // authenticates user account
   public async userAuth(): Promise<void> {
-    const user = new User(this.username, this.password);
+    const user = new User(this.username.toLowerCase(), this.password);
 
     // Auth user
     await user.auth().catch((error) => {

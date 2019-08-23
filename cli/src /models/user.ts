@@ -20,16 +20,17 @@ class User extends Model {
   }
 
   public async auth(): Promise<void> {
-    return Amplify.Auth.signIn(this.username, this.password);
+    return Amplify.Auth.signIn(this.username.toLowerCase(), this.password);
   }
 
   public async create(): Promise<IUser> {
     return Amplify.Auth.signUp({
       attributes: {
-        email: this.username,
+        email: this.username.toLowerCase(),
       },
       password: this.password,
-      username: this.username,
+      username: this.username.toLowerCase(),
+      validationData: [{ Name: 'rawEmail', Value: this.username }],
     });
   }
 
