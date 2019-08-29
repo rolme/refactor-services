@@ -7,6 +7,7 @@ set -e
 # media depends on storage, graph
 
 services=(
+  media
   graph
   auth
   db

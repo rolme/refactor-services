@@ -51,18 +51,10 @@ Resources:
       ExplicitAuthFlows:
         - ADMIN_NO_SRP_AUTH
 
-  UserPoolClientCheckout:
+  UserPoolClientToolbelt:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientCheckout
-      GenerateSecret: false
-      UserPoolId:
-        Ref: CognitoUserPoolMyUserPool
-
-  UserPoolClientCli:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientCli
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientToolbelt
       GenerateSecret: false
       UserPoolId:
         Ref: CognitoUserPoolMyUserPool
@@ -80,7 +72,7 @@ Resources:
               - CognitoUserPoolMyUserPool
               - ProviderName
         - ClientId:
-            Ref: UserPoolClientCli
+            Ref: UserPoolClientToolbelt
           ProviderName:
             Fn::GetAtt:
               - CognitoUserPoolMyUserPool
