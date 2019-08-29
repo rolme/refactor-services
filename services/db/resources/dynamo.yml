@@ -7,26 +7,60 @@ Resources:
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
-        - AttributeName: sort
+        - AttributeName: key
           AttributeType: S
-        - AttributeName: data
+        - AttributeName: entity
           AttributeType: S
+        - AttributeName: scope
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: N
+        - AttributeName: updatedAt
+          AttributeType: N
       KeySchema:
         - AttributeName: id
           KeyType: HASH
-        - AttributeName: sort
+        - AttributeName: key
           KeyType: RANGE
       GlobalSecondaryIndexes:
-        - IndexName: gsi1pk
+        - IndexName: KeyIdIndex
           KeySchema:
-            - AttributeName: sort
+            - AttributeName: key
               KeyType: HASH
+            - AttributeName: id
+              KeyType: RANGE
           Projection:
             ProjectionType: ALL
-        - IndexName: gsi1sk
+        - IndexName: EntityIdIndex
           KeySchema:
-            - AttributeName: data
+            - AttributeName: entity
               KeyType: HASH
+            - AttributeName: id
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: entityCreatedAtIndex
+          KeySchema:
+            - AttributeName: entity
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: entityUpdatedAtIndex
+          KeySchema:
+            - AttributeName: entity
+              KeyType: HASH
+            - AttributeName: updatedAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: EntityScopeIndex
+          KeySchema:
+            - AttributeName: entity
+              KeyType: HASH
+            - AttributeName: scope
+              KeyType: RANGE
           Projection:
             ProjectionType: ALL
 

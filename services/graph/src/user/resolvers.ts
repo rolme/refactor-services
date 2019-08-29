@@ -5,113 +5,117 @@ import User from './model';
 const cognito = new CognitoIdentityServiceProvider();
 
 export async function find(event: types.Event<{}>) {
-  return getUser(event.context.identity.sub);
-}
+  const username = `USER-${event.context.identity.sub}`;
+  console.log('username', username);
 
-export async function getUser(userName: string) {
-  const result = await User.get({
-    id: userName,
-  });
+  const user = await User.queryOne('id')
+    .eq(username)
+    .where('key')
+    .eq(username)
+    .exec();
 
-  if (!result) {
+  console.log('user', user);
+  if (!user) {
     throw new Error('User not found');
   }
 
-  const user: { [key: string]: any } = result;
-
-  if (user.expiresAt) {
-    user.expiresAt = new Date(parseInt(user.expiresAt, 10));
-  }
-  user.createdAt = new Date(result.createdAt);
-  user.updatedAt = new Date(result.updatedAt);
-
-  user.state = 'FREE_TRIAL';
-  if (user.expiresAt && user.expiresAt < new Date()) {
-    user.state = 'EXPIRED';
-  } else {
-    if (user.expiresAt) {
-      user.state = 'EXPIRING_SUBSCRIBER';
-    } else {
-      user.state = 'ACTIVE_SUBSCRIBER';
-    }
-  }
+  // TODO: Check status & expiration, not needed now.
   return user;
 }
 
 export async function update(
   event: types.Event<types.UpdateUserMutationVariables>,
 ) {
-  const updateUser = {} as any;
+  const updateUser: { [key: string]: any } = {};
 
   if (event.context.arguments.email) {
-    updateUser['email'] = event.context.arguments.email;
-
-    const UserAttributes = [
-      {
-        Name: 'email',
-        Value: event.context.arguments.email.toLowerCase(),
-      },
-      {
-        Name: 'email_verified',
-        Value: 'true',
-      },
-    ];
-
-    await cognito
-      .adminUpdateUserAttributes({
-        UserAttributes,
-        UserPoolId: process.env.USER_POOL_ID!,
-        Username: event.context.identity.sub,
-      })
-      .promise();
+    updateUser.email = event.context.arguments.email;
+    await updateCognitoUser(
+      event.context.arguments.email,
+      event.context.identity.sub,
+    );
   }
 
   if (event.context.arguments.name) {
-    updateUser['name'] = event.context.arguments.name;
+    updateUser.name = event.context.arguments.name;
   }
 
   if (event.context.arguments.profile) {
-    updateUser['profile'] = event.context.arguments.profile;
+    updateUser.profile = event.context.arguments.profile;
   }
 
   if (Object.keys(updateUser).length) {
     await User.update(
       {
-        id: event.context.identity.sub,
+        id: `USER-${event.context.identity.sub}`,
+        key: `USER-${event.context.identity.sub}`,
       },
       updateUser,
     );
   }
 
-  return getUser(event.context.identity.sub);
+  return find(event);
+}
+
+export async function findAll() {
+  const users = await User.query('entity')
+    .eq('USER')
+    .using('EntityIdIndex')
+    .exec();
+
+  // TODO: Check status & expiration, not needed now.
+  return users;
+}
+
+async function updateCognitoUser(email: string, username: string) {
+  const UserAttributes = [
+    {
+      Name: 'email',
+      Value: email.toLowerCase(),
+    },
+    {
+      Name: 'email_verified',
+      Value: 'true',
+    },
+  ];
+
+  await cognito
+    .adminUpdateUserAttributes({
+      UserAttributes,
+      UserPoolId: process.env.USER_POOL_ID!,
+      Username: username,
+    })
+    .promise();
 }
 
 export async function remove(event: types.Event<{}>) {
-  const user = await User.get({
-    id: event.context.identity.sub,
-  });
+  const user = await find(event);
+  const Username = event.context.identity.sub;
+  const UserPoolId = process.env.USER_POOL_ID!;
 
   if (!user) {
     return null;
   }
 
-  const userAttr = await getUser(event.context.identity.sub);
-
   await cognito
     .adminUserGlobalSignOut({
-      UserPoolId: process.env.USER_POOL_ID!,
-      Username: event.context.identity.sub,
+      UserPoolId,
+      Username,
     })
     .promise();
 
   await cognito
     .adminDeleteUser({
-      UserPoolId: process.env.USER_POOL_ID!,
-      Username: event.context.identity.sub,
+      UserPoolId,
+      Username,
     })
     .promise();
 
-  await user.delete();
+  await user.delete((err) => {
+    if (err) {
+      throw new Error(`Unable to delete ${Username}`);
+    }
+  });
 
-  return userAttr;
+  return user;
 }

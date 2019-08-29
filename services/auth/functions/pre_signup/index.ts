@@ -2,30 +2,31 @@ import { DynamoDB } from 'aws-sdk';
 import * as validator from 'validator';
 
 const ddb = new DynamoDB.DocumentClient();
+const TRIAL_LENGTH_IN_DAYS = 14;
 
-async function addUserToDdb(
+async function insertUser(
+  email: string,
   userName: string,
-  email: string, // Email coming from end-user will be case-incensitive
-  customerId: string,
+  scope: string,
+  trailLength: number,
 ) {
-  // Set expiration date 14 days from now
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 14);
-
   const now = new Date().getTime();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + trailLength);
 
   const data: { [key: string]: any } = {
-    data: email.toLowerCase(),
+    admin: false,
+    createdAt: now,
+    disabled: false,
     email,
+    entity: 'USER',
     expiresAt: expiresAt.getTime(),
     id: `USER-${userName}`,
+    key: `USER-${userName}`,
+    scope,
+    status: 'TRIAL',
     updatedAt: now,
   };
-
-  data.createdAt = now;
-  data.sort = `${email.toLowerCase()}|${data.createdAt}`;
-
-  console.log('inserting ddb record:', data);
 
   return ddb
     .put({
@@ -47,14 +48,15 @@ export const handler = async (event: any = {}): Promise<any> => {
     throw new Error('Email is invalid');
   }
 
+  let source = 'UNKNOWN';
   let rawEmail = email;
 
-  console.log('event:', event.request.validationData);
   if (event.request.validationData) {
     rawEmail = event.request.validationData.rawEmail;
+    source = event.request.validationData.source;
   }
 
-  await addUserToDdb(event.userName, rawEmail, 'none');
+  await insertUser(rawEmail, event.userName, source, TRIAL_LENGTH_IN_DAYS);
 
   // Auto confirm all users
   console.log('autoconfirming user:', event.userName);
