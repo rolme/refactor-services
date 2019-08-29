@@ -1,15 +1,17 @@
 ##### Enumarations
 
-enum AccountState {
-  FREE_TRIAL
-  ACTIVE_SUBSCRIBER
-  EXPIRING_SUBSCRIBER
+enum UserStatus {
   EXPIRED
+  GENERAL
+  SUBSCRIBER
+  TRIAL
 }
 
-enum SortOrder {
-  ASC
-  DESC
+enum CATEGORY {
+  EAT
+  FOCUS
+  MOVE
+  SLEEP
 }
 
 ##### Inputs
@@ -47,18 +49,15 @@ type Address @aws_cognito_user_pools @aws_api_key {
   street: [String]
 }
 
-type Category {
-  id: ID!
-  name: String!
-}
-
 type Habit {
-  category: Category
+  category: Category!
   createdAt: String!
   deletedAt: String
   description: String!
   enableWeekends: Boolean
+  id: String!
   place: String
+  sort: String!
   tasks: [Task]
   time: String!
   trigger: String
@@ -93,11 +92,6 @@ type S3Object @aws_cognito_user_pools @aws_api_key {
   mimeType: String!
 }
 
-type Subscription {
-  onDeleteUser: User @aws_subscribe(mutations: ["deleteUser"])
-  onUpdateUser: User @aws_subscribe(mutations: ["updateUser"])
-}
-
 type User {
   admin: Boolean!
   avatar: S3Object @aws_cognito_user_pools @aws_api_key
@@ -113,9 +107,9 @@ type User {
   resetAt: String
   resetToken: String
   sort: String
-  status: AccountState!
+  status: UserStatus!
+  tasks: [Task]
   updatedAt: String!
-  welcomeEmailPending: String
 }
 
 type Task {
@@ -131,6 +125,7 @@ type Task {
 
 type Query {
   getUser: User
+  getUsers: [User]
   getHabit: Habit
   getHabits: [Habit]
   getTask: Task
@@ -142,5 +137,4 @@ type Query {
 schema {
   query: Query
   mutation: Mutation
-  subscription: Subscription
 }

@@ -90,6 +90,11 @@ custom:
         field: getUser
         request: getUser-request.vtl
         response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Query
+        field: getUsers
+        request: getUsers-request.vtl
+        response: json-response.vtl
 
       # Mutations
       - dataSource: LambdaResolver

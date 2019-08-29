@@ -31,7 +31,6 @@ const UserSchema = new Schema(
       type: Map,
     },
     confirmedAt: {
-      required: false,
       type: String,
     },
     createdAt: {
@@ -47,11 +46,24 @@ const UserSchema = new Schema(
       required: true,
       type: String,
     },
+    entity: {
+      required: true,
+      type: String,
+    },
     expiresAt: {
       type: String,
     },
     id: {
       hashKey: true,
+      index: {
+        global: true,
+        rangeKey: 'key',
+      },
+      required: true,
+      type: String,
+    },
+    key: {
+      rangeKey: true,
       required: true,
       type: String,
     },
@@ -59,7 +71,7 @@ const UserSchema = new Schema(
       type: String,
     },
     profile: {
-      default: {},
+      default: null,
       map: {
         address: {
           default: {},
@@ -115,25 +127,17 @@ const UserSchema = new Schema(
     resetToken: {
       type: String,
     },
-    sort: {
-      default: new Date().getTime(),
-      index: true,
-      rangeKey: true,
+    scope: {
       type: String,
     },
     status: {
+      default: 'TRIAL',
+      enum: ['EXPIRED', 'GENERAL', 'SUBSCRIBER', 'TRIAL'],
+      required: true,
       type: String,
     },
     updatedAt: {
       required: true,
-      type: String,
-    },
-    welcomeEmailPending: {
-      index: {
-        global: true,
-        name: 'WelcomeEmailPendingIndex',
-        project: true,
-      },
       type: String,
     },
   },
@@ -142,7 +146,11 @@ const UserSchema = new Schema(
   },
 );
 
-export default model<IUser, { id: string }>(
-  process.env.TABLE_REFACTOR || 'Users',
+export default model<IUser, { id: string; key: string }>(
+  process.env.TABLE_REFACTOR || 'Refactor',
   UserSchema,
+  {
+    create: true,
+    update: true,
+  },
 );

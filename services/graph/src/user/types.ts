@@ -1,14 +1,18 @@
-
 export interface IUser {
-  id: string;
-  email: string;
-  name?: string | null;
-  picture?: {
+  admin: string;
+  avatar?: {
     bucket: string;
     key: string;
     region: string;
     mimeType: string;
   } | null;
+  createdAt: string;
+  email: string;
+  entity: string;
+  expiresAt?: number | null;
+  id: string;
+  key: string;
+  name?: string | null;
   profile?: {
     address?: {
       country?: string | null;
@@ -24,8 +28,6 @@ export interface IUser {
     title?: string | null;
     website?: string | null;
   } | null;
-  expiresAt?: number | null;
-  createdAt: string;
+  scope: string;
   updatedAt: string;
-  welcomeEmailPending?: string | null;
 }

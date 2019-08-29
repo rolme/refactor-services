@@ -30,7 +30,10 @@ class User extends Model {
       },
       password: this.password,
       username: this.username.toLowerCase(),
-      validationData: [{ Name: 'rawEmail', Value: this.username }],
+      validationData: [
+        { Name: 'rawEmail', Value: this.username },
+        { Name: 'source', Value: 'REFACTOR-TOOLBELT' },
+      ],
     });
   }
 
