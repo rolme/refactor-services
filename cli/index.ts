@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 // TODO: this hack ends the node process with a non-zero exit code
 // and spits back the exact promise rejection error message.
 process.on('unhandledRejection', (reason) => {
@@ -13,7 +10,7 @@ process.on('unhandledRejection', (reason) => {
 import './polyfills';
 
 import * as program from 'commander';
-import UserActions from './src /actions/user-actions';
+import UserActions from './src/actions/user-actions';
 
 program
   .command('create <entity>')
@@ -64,3 +61,5 @@ program
   });
 
 program.parse(process.argv);
+
+console.log('done');

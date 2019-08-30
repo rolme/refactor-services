@@ -1,3 +1,4 @@
+import { Config } from '../../toolbelt.config';
 import deleteMe from '../graph/mutations/user-delete';
 import updateMe from '../graph/mutations/user-update';
 import { IUserData } from '../types/user';
@@ -45,10 +46,10 @@ class User extends Model {
     return this.request(updateMe, {
       name: UserData.name,
       picture: {
-        bucket: process.env.UPLOAD_BUCKET,
+        bucket: Config.toolbelt.s3UploadBucket,
         key: `cli/${UserData.key}`,
         mimeType: 'image/jpeg',
-        region: process.env.REGION,
+        region: Config.toolbelt.awsRegion,
       },
       profile: UserData.profile,
     });
