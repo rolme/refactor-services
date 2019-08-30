@@ -1,12 +1,50 @@
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { CognitoIdentityServiceProvider, Lambda } from 'aws-sdk';
+import * as validator from 'validator';
+import { S3File } from '../../lib/S3File';
+
 import * as types from '../types';
 import User from './model';
 
+const avatarFileTypes = ['image/jpeg', 'image/jpg'];
 const cognito = new CognitoIdentityServiceProvider();
+const lambda = new Lambda();
+
+async function uploadImageFile(
+  bucket: string,
+  authorization: string | undefined,
+  key: string,
+  image: any,
+) {
+  if (bucket === process.env.UPLOAD_BUCKET) {
+    const args = {
+      authorization,
+      [key]: image,
+    };
+    await lambda
+      .invoke({
+        FunctionName: process.env.LAMBDA_THUMBNAILS!,
+        InvocationType: 'Event',
+        Payload: JSON.stringify(args),
+      })
+      .promise();
+  }
+}
+
+async function validImageFile(file: types.S3ObjectInput) {
+  const s3file = new S3File(file);
+
+  // Check if file has been uploaded
+  if (!(await s3file.exists())) {
+    throw new Error('File not found');
+  }
+
+  if (!avatarFileTypes.includes(file.mimeType)) {
+    throw new Error('Invalid file type');
+  }
+}
 
 export async function find(event: types.Event<{}>) {
   const username = `USER-${event.context.identity.sub}`;
-  console.log('username', username);
 
   const user = await User.queryOne('id')
     .eq(username)
@@ -14,7 +52,6 @@ export async function find(event: types.Event<{}>) {
     .eq(username)
     .exec();
 
-  console.log('user', user);
   if (!user) {
     throw new Error('User not found');
   }
@@ -28,7 +65,16 @@ export async function update(
 ) {
   const updateUser: { [key: string]: any } = {};
 
+  if (event.context.arguments.avatar) {
+    await validImageFile(event.context.arguments.avatar);
+    updateUser.avatar = event.context.arguments.avatar;
+  }
+
   if (event.context.arguments.email) {
+    if (!validator.isEmail(event.context.arguments.email)) {
+      throw new Error('Email is invalid');
+    }
+
     updateUser.email = event.context.arguments.email;
     await updateCognitoUser(
       event.context.arguments.email,
@@ -51,6 +97,15 @@ export async function update(
         key: `USER-${event.context.identity.sub}`,
       },
       updateUser,
+    );
+  }
+
+  if (event.context.arguments.avatar) {
+    await uploadImageFile(
+      event.context.arguments.avatar.bucket,
+      event.context.request.headers.authorization,
+      'avatar',
+      event.context.arguments.avatar,
     );
   }
 

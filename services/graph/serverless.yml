@@ -20,10 +20,11 @@ functions:
     name: ${self:service}-${self:custom.stage}-GraphqlLambda
     role: GraphResolverRole
     environment:
+      LAMBDA_DELETE_FILES: refactor-media-${self:custom.stage}-delete_files
+      LAMBDA_THUMBNAILS: refactor-media-${self:custom.stage}-thumbnails
       TABLE_REFACTOR: ${cf:refactor-db-${self:custom.stage}.DynamoTableRefactor}
       USER_POOL_ID: ${cf:refactor-auth-${self:custom.stage}.UserPool}
       UPLOAD_BUCKET: ${cf:refactor-storage-${self:custom.stage}.UploadBucket}
-      LAMBDA_DELETE_FILES: refactor-media-${self:custom.stage}-delete_files
     timeout: 30
 
 custom:

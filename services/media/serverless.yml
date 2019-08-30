@@ -1,0 +1,52 @@
+service: refactor-media
+
+provider:
+  deploymentBucket:
+    name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
+  name: aws
+  runtime: python3.7
+  region: ${opt:region, 'us-west-2'}
+  versionFunctions: false
+  logRetentionInDays: 14
+
+package:
+  individually: true
+  exclude:
+    - ./**
+
+functions:
+  thumbnails:
+    handler: functions/thumbnails/index.handler
+    package:
+      include:
+        - functions/thumbnails/index.py
+    module: functions/thumbnails
+    role: ThumbnailsRole
+    memorySize: 2048
+    timeout: 60
+    environment:
+      MEDIA_BUCKET: ${cf:refactor-storage-${self:custom.stage}.MediaBucket}
+      MEDIA_BUCKET_REGION: ${cf:refactor-storage-${self:custom.stage}.MediaBucketRegion}
+      GRAPHQL_URL: ${cf:refactor-graph-${self:custom.stage}.GraphQlApiUrl}
+    layers:
+      # Custom layer build instructions documented in #148
+      - arn:aws:lambda:us-west-2:114022496723:layer:eq2cm:1
+      - arn:aws:lambda:us-west-2:114022496723:layer:perl-5_28-layer:1
+      - arn:aws:lambda:us-west-2:114022496723:layer:exiftool:1
+      - arn:aws:lambda:us-west-2:420165488524:layer:AWSLambda-Python37-SciPy1x:2
+      - arn:aws:lambda:us-west-2:113088814899:layer:Klayers-python37-Pillow:5
+  delete_files:
+    handler: functions/delete_files/index.handler
+    package:
+      include:
+        - functions/delete_files/index.py
+    module: functions/delete_files
+    role: DeleteFilesRole
+    environment:
+      MEDIA_BUCKET: ${cf:refactor-storage-${self:custom.stage}.MediaBucket}
+
+custom:
+  stage: ${opt:stage}
+
+resources:
+  - ${file(resources/iam.yml)}

@@ -9,4 +9,4 @@ awsconfig
 node_modules
 amplify
 /config.yml
-exports.yml
+exports.yml*
