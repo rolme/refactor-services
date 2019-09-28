@@ -33,4 +33,4 @@ fi
 # python bin/modify-operations-graphql.py ./services/graph/.serverless/amplify-operations.graphql ./amplify/operations.graphql
 
 # generate exports yml
-# bin/exports.sh $@ > exports.yml
+bin/exports.sh $@ > exports.yml
