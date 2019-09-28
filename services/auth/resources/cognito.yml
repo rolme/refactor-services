@@ -15,6 +15,14 @@ Resources:
           RequireSymbols: false
           RequireUppercase: false
 
+  UserPoolClientAndroid:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:custom.stage}-UserPoolClientAndroid
+      GenerateSecret: false
+      UserPoolId:
+        Ref: CognitoUserPoolMyUserPool
+
   UserPoolClientiOS:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -26,14 +34,32 @@ Resources:
   UserPoolClientWeb:
     Type: AWS::Cognito::UserPoolClient
     Properties:
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+        - profile
+      CallbackURLs:
+        - https://auth.refactordaily.com # TODO: Must change
       ClientName: ${self:service}-${self:custom.stage}-UserPoolClientWeb
       GenerateSecret: false
       UserPoolId:
         Ref: CognitoUserPoolMyUserPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
 
   UserPoolClientJest:
     Type: AWS::Cognito::UserPoolClient
     Properties:
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+        - profile
+      CallbackURLs:
+        - https://auth.refactordaily.com # TODO: Must change
       ClientName: ${self:service}-${self:custom.stage}-UserPoolClientJest
       GenerateSecret: false
       UserPoolId:
@@ -44,6 +70,14 @@ Resources:
   UserPoolClientPlayground:
     Type: AWS::Cognito::UserPoolClient
     Properties:
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+        - profile
+      CallbackURLs:
+        - https://auth.refactordaily.com # TODO: Must change
       ClientName: ${self:service}-${self:custom.stage}-UserPoolClientPlayground
       GenerateSecret: false
       UserPoolId:
@@ -66,6 +100,12 @@ Resources:
       AllowUnauthenticatedIdentities: false
       CognitoIdentityProviders:
         - ClientId:
+            Ref: UserPoolClientAndroid
+          ProviderName:
+            Fn::GetAtt:
+              - CognitoUserPoolMyUserPool
+              - ProviderName
+        - ClientId:
             Ref: UserPoolClientiOS
           ProviderName:
             Fn::GetAtt:
@@ -73,12 +113,6 @@ Resources:
               - ProviderName
         - ClientId:
             Ref: UserPoolClientToolbelt
-          ProviderName:
-            Fn::GetAtt:
-              - CognitoUserPoolMyUserPool
-              - ProviderName
-        - ClientId:
-            Ref: UserPoolClientWeb
           ProviderName:
             Fn::GetAtt:
               - CognitoUserPoolMyUserPool
@@ -137,12 +171,24 @@ Outputs:
   UserPool:
     Value:
       Ref: CognitoUserPoolMyUserPool
-  UserPoolClientPlayground:
+  UserPoolClientAndroid:
     Value:
-      Ref: UserPoolClientPlayground
+      Ref: UserPoolClientAndroid
+  UserPoolClientiOS:
+    Value:
+      Ref: UserPoolClientiOS
   UserPoolClientJest:
     Value:
       Ref: UserPoolClientJest
+  UserPoolClientPlayground:
+    Value:
+      Ref: UserPoolClientPlayground
+  UserPoolClientToolbelt:
+    Value:
+      Ref: UserPoolClientToolbelt
+  UserPoolClientWeb:
+    Value:
+      Ref: UserPoolClientWeb
   IdentityPool:
     Value:
       Ref: CognitoIdentityPool

@@ -1,5 +1,5 @@
-import { DynamoDB } from 'aws-sdk';
 import * as mail from '@sendgrid/mail';
+import { DynamoDB } from 'aws-sdk';
 
 const ddb = new DynamoDB.DocumentClient();
 
@@ -7,18 +7,16 @@ mail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 async function sendWelcomeEmail(email: string, templateId: string) {
   const msg = {
-    to: {
-      email: email,
-    },
     from: {
-      name: 'Refactor Daily',
       email: 'notifications@refactordaily.com',
+      name: 'Refactor Daily',
     },
     replyTo: {
-      name: 'Refactor Daily',
       email: 'help@refactordaily.com',
+      name: 'Refactor Daily',
+      templateId,
+      to: { email },
     },
-    templateId: templateId,
   };
   console.log('sending mail:', msg);
   return mail.send(msg);
@@ -28,14 +26,14 @@ async function updatePendingFlag(userId: string) {
   console.log('removing welcomeEmailPending for user', userId);
   return ddb
     .update({
-      TableName: process.env.TABLE_REFACTOR!,
-      Key: {
-        id: userId,
-      },
-      UpdateExpression: 'REMOVE #KEY1',
       ExpressionAttributeNames: {
         '#KEY1': 'welcomeEmailPending',
       },
+      Key: {
+        id: userId,
+      },
+      TableName: process.env.TABLE_REFACTOR!,
+      UpdateExpression: 'REMOVE #KEY1',
     })
     .promise();
 }
@@ -45,10 +43,6 @@ export const handler = async (event: any = {}): Promise<any> => {
 
   const users = await ddb
     .query({
-      TableName: process.env.TABLE_REFACTOR!,
-      IndexName: 'WelcomeEmailPendingIndex',
-      KeyConditionExpression: '#KEY1 = :value1',
-      FilterExpression: '#KEY2 < :value2',
       ExpressionAttributeNames: {
         '#KEY1': 'welcomeEmailPending',
         '#KEY2': 'createdAt',
@@ -57,7 +51,11 @@ export const handler = async (event: any = {}): Promise<any> => {
         ':value1': 'true',
         ':value2': new Date().getTime() - 600000, // 10 minutes ago
       },
+      FilterExpression: '#KEY2 < :value2',
+      IndexName: 'WelcomeEmailPendingIndex',
+      KeyConditionExpression: '#KEY1 = :value1',
       ProjectionExpression: 'id, email, stripe.subscriptionId',
+      TableName: process.env.TABLE_REFACTOR!,
     })
     .promise()
     .catch((error) => console.log('error:', error.toString()));

@@ -1,6 +1,7 @@
 service: refactor-auth
 
 plugins:
+  - serverless-cognito-add-custom-attributes
   - serverless-webpack
 
 provider:
@@ -26,6 +27,21 @@ functions:
 
 custom:
   stage: ${opt:stage}
+
+  CognitoAddCustomAttributes:
+    CognitoUserPoolIdOutputKey: UserPool
+    CognitoUserPoolClientIdOutputKey: UserPoolClientiOS
+    CustomAttributes:
+      - AttributeDataType: String
+        DeveloperOnlyAttribute: False
+        Mutable: True
+        Name: 'rawEmail'
+        Required: False
+      - AttributeDataType: String
+        DeveloperOnlyAttribute: False
+        Mutable: True
+        Name: 'role'
+        Required: False
 
 resources:
   - ${file(resources/cognito.yml)}
