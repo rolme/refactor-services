@@ -1,5 +1,6 @@
 import * as dynamoose from 'dynamoose';
 
+import * as habit from './habit';
 import * as types from './types';
 import * as user from './user';
 
@@ -8,7 +9,11 @@ interface IResolvers {
 }
 
 const resolvers: IResolvers = {
+  createHabit: habit.create,
+  deleteHabit: habit.remove,
   deleteUser: user.remove,
+  getHabit: habit.find,
+  getHabits: habit.findAll,
   getUser: user.find,
   getUsers: user.findAll,
   updateUser: user.update,

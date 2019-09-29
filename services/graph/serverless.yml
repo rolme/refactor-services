@@ -88,6 +88,16 @@ custom:
       # Queries
       - dataSource: LambdaResolver
         type: Query
+        field: getHabit
+        request: getHabit-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Query
+        field: getHabits
+        request: getHabits-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Query
         field: getUser
         request: getUser-request.vtl
         response: json-response.vtl
@@ -100,13 +110,23 @@ custom:
       # Mutations
       - dataSource: LambdaResolver
         type: Mutation
-        field: updateUser
-        request: updateUser-request.vtl
+        field: createHabit
+        request: createHabit-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
+        field: deleteHabit
+        request: deleteHabit-request.vtl
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Mutation
         field: deleteUser
         request: deleteUser-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
+        field: updateUser
+        request: updateUser-request.vtl
         response: json-response.vtl
       # Nested Resolvers
 
