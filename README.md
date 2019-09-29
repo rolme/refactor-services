@@ -113,6 +113,12 @@ awslogs groups
 awslogs get /aws/lambda/refactor-auth-STAGE-preSignUp ALL -w
 ````
 
+Another example:
+
+```sh
+cd services/graph && sls logs -t -v -f graphql -s STAGE
+```
+
 ### Tests
 
 Run `yarn test` (or just `jest`) to run regression tests against a deployment. The file `exports.yml` must exist, which is created at the end of the deploy script.
