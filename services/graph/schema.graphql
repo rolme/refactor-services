@@ -58,10 +58,11 @@ type Habit {
   id: String!
   place: String
   sort: String!
-  tasks: [Task]
+  tasks: [Task!]!
   time: String!
   trigger: String
   updatedAt: String!
+  userId: ID!
   user: User!
   why: String
 }
@@ -107,13 +108,13 @@ type User {
   createdAt: String!
   email: String!
   expiresAt: String
-  habits: [Habit]
+  habits: [Habit!]!
   id: ID! @aws_cognito_user_pools @aws_api_key
   name: String @aws_cognito_user_pools @aws_api_key
   profile: Profile @aws_cognito_user_pools @aws_api_key
   role: String!
   status: UserStatus!
-  tasks: [Task]
+  tasks: [Task!]!
   updatedAt: String!
   welcomeSentAt: String
 }
