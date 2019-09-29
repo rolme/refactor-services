@@ -8,7 +8,7 @@
     "deploy": "bin/deploy.sh",
     "info": "bin/info.sh",
     "remove": "bin/remove.sh",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "resolutions": {
     "jest-cli": "24.5.0"

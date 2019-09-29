@@ -1,6 +1,7 @@
 import { CognitoIdentityServiceProvider, Lambda } from 'aws-sdk';
 import * as validator from 'validator';
 import { S3File } from '../../lib/S3File';
+import Habit from '../habit/model';
 import * as types from '../types';
 import User from './model';
 
@@ -98,9 +99,22 @@ export async function remove(event: types.Event<{}>) {
   await cognito.adminUserGlobalSignOut({ UserPoolId, Username }).promise();
   await cognito.adminDeleteUser({ UserPoolId, Username }).promise();
 
+  await destroyAssociatedItems(id);
   await User.delete({ hash: user.hash, range: user.range });
-
   return user;
+}
+
+async function destroyAssociatedItems(userId: string) {
+  // HABITS
+  const habits = await Habit.query('hash')
+    .eq(userId)
+    .where('range')
+    .beginsWith('HABIT-')
+    .exec();
+
+  for (const habit of habits) {
+    await Habit.delete({ hash: habit.hash, range: habit.range });
+  }
 }
 
 async function uploadImageFile(
