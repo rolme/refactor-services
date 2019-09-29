@@ -1,41 +1,7 @@
 import { DynamoDB } from 'aws-sdk';
 import * as validator from 'validator';
 
-const ddb = new DynamoDB.DocumentClient();
 const TRIAL_LENGTH_IN_DAYS = 14;
-
-async function insertUser(
-  email: string,
-  userName: string,
-  scope: string,
-  trailLength: number,
-) {
-  const now = new Date().getTime();
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + trailLength);
-
-  const data: { [key: string]: any } = {
-    admin: false,
-    createdAt: now,
-    disabled: false,
-    email,
-    entity: 'USER',
-    expiresAt: expiresAt.getTime(),
-    id: `USER-${userName}`,
-    key: `USER-${userName}`,
-    scope,
-    status: 'TRIAL',
-    updatedAt: now,
-  };
-
-  return ddb
-    .put({
-      Item: data,
-      TableName: process.env.TABLE_REFACTOR!,
-    })
-    .promise()
-    .catch((error) => console.log(error.toString()));
-}
 
 export const handler = async (event: any = {}): Promise<any> => {
   const email = event.request.userAttributes.email;
@@ -48,20 +14,59 @@ export const handler = async (event: any = {}): Promise<any> => {
     throw new Error('Email is invalid');
   }
 
-  let source = 'UNKNOWN';
   let rawEmail = email;
+  if (event.request.userAttributes.hasOwnProperty('custom:rawEmail')) {
+    rawEmail = event.request.userAttributes['custom:rawEmail'];
+  }
 
+  let role = 'guest';
+  if (event.request.userAttributes.hasOwnProperty('custom:role')) {
+    role = event.request.userAttributes['custom:role'];
+  }
+
+  let source = 'UNKNOWN';
   if (event.request.validationData) {
-    rawEmail = event.request.validationData.rawEmail;
     source = event.request.validationData.source;
   }
 
-  await insertUser(rawEmail, event.userName, source, TRIAL_LENGTH_IN_DAYS);
+  await createDynamoUser(rawEmail, event.userName, role, source);
 
-  // Auto confirm all users
-  console.log('autoconfirming user:', event.userName);
   event.response.autoConfirmUser = true;
   event.response.autoVerifyEmail = true;
 
   return event;
 };
+
+async function createDynamoUser(
+  email: string,
+  username: string,
+  role: string,
+  source: string,
+) {
+  const ddb = new DynamoDB.DocumentClient();
+  const now = new Date().getTime();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + TRIAL_LENGTH_IN_DAYS);
+
+  const data: { [key: string]: any } = {
+    createdAt: now,
+    email,
+    hash: `USER-${username}`,
+    id: `USER-${username}`,
+    range: `USER-${username}`,
+    role,
+    scope: `TRIAL-${expiresAt.getTime().toString()}`,
+    source,
+    status: 'TRIAL',
+    type: 'USER',
+    updatedAt: now,
+  };
+
+  return ddb
+    .put({
+      Item: data,
+      TableName: process.env.TABLE_REFACTOR!,
+    })
+    .promise()
+    .catch((error) => console.log(error.toString()));
+}

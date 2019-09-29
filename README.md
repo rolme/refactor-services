@@ -2,7 +2,7 @@
 
 ## About
 
-This monorepo contains all backend services.
+This mono-repo contains all backend services.
 
 ## Getting Started
 
@@ -38,7 +38,7 @@ All scripts are configured in the root package file and can be executed via `yar
 
 They accept any of the following arguments:
 
-```
+```sh
 -s, --stage       Stage of the services. Defaults to `dev` [REQUIRED].
 -r, --region      Region of the services. Defaults to `us-west-2`.
 -v, --verbose     Shows all stack events during deployment, and display any Stack Output.
@@ -48,32 +48,32 @@ Prepend `SLS_DEBUG=*` for stack trace debugging.
 
 ### Deploying the Services
 
-```
-yarn run deploy -s [STAGE]
+```sh
+yarn run deploy -s STAGE
 ```
 
 ### Removing the Services
 
-```
-yarn run remove -s [STAGE]
+```sh
+yarn run remove -s STAGE
 ```
 
 ### GraphQL Playground
 
-```
-(cd services/graph; serverless graphql-playground -s [STAGE] --username YOUR_USERNAME --password YOUR_PASSWORD)
+```sh
+(cd services/graph; serverless graphql-playground -s STAGE --username YOUR_USERNAME --password YOUR_PASSWORD)
 ```
 
 ## Debug
 
-### Install python/pip to use the tools below. On a Mac:
+### Install python/pip to use the tools below. On a Mac
 
 1. Install [Homebrew](https://brew.sh/)
 2. brew install python
 
 Homebrew will install python3 and pip3, which you should use instead of system python/pip (ie. pip3 install awscli awslogs).
 
-```
+```sh
 ➜  ~ python3 --version
 Python 3.7.2
 ```
@@ -82,7 +82,7 @@ Python 3.7.2
 
 Use the [aws](https://aws.amazon.com/cli/) cli to create a test user as described [here](https://serverless-stack.com/chapters/create-a-cognito-test-user.html).
 
-Emails with the format `qa_test+{foo}@refactordaily.com` are preferred.
+Emails with the format `qa-test+{foo}@refactordaily.com` are preferred.
 
 The default region for the project is `us-west-2`.
 
@@ -90,12 +90,16 @@ The client-id is the iOS/Android/Web client-id from the user pool. There are a n
 
 Example:
 
-```
-$ aws cognito-idp sign-up \
+````sh
+email=Test+1@RefactorDaily.com && \
+aws cognito-idp sign-up \
   --region us-west-2 \
-  --client-id YOUR_COGNITO_APP_CLIENT_ID \
-  --username qa_test+1@refactordaily.com \
-  --password 121212
+  --client-id $(sed -n '/^playground:$/,$p' exports.yml | grep "cognitoUserPoolClientId:" | head -1 | xargs | cut -d" " -f2) \
+  --username $(echo $email | tr '[:upper:]' '[:lower:]') \
+  --password refactor123 \
+  --user-attributes \
+    Name="custom:rawEmail",Value="$email" \
+    Name="custom:role",Value="admin"
 ```
 
 ### Logs
@@ -104,37 +108,20 @@ Use the [awslogs](https://github.com/jorgebastida/awslogs) cli to tail CloudWatc
 
 Examples:
 
-```
+```sh
 awslogs groups
 awslogs get /aws/lambda/refactor-auth-STAGE-preSignUp ALL -w
-```
+````
 
 ### Tests
 
 Run `yarn test` (or just `jest`) to run regression tests against a deployment. The file `exports.yml` must exist, which is created at the end of the deploy script.
 
-## Stripe
+### DynamoDB Table Design
 
-Follow these steps to set up Stripe integration.
-
-1. Get the Stripe POST endpoint in the serverless api service and add it to the [webhooks](https://dashboard.stripe.com/account/webhooks) list on the Stripe dashboard.
-
-2. Get the signing secret for the webhook from the Stripe dashboard and add it to AWS Parameter Store with the following command. Replace STAGE and SIGNING_SECRET.
-
-```
-aws ssm put-parameter --name refactor-STAGE-stripeSigningSecret --type String --value SIGNING_SECRET
-```
-
-3. Get the Stripe secret key from the Stripe dashboard and add it to SSM.
-
-```
-aws ssm put-parameter --name refactor-STAGE-stripeSecretKey --type String --value SECRET_KEY
-```
-
-## Sendgrid
-
-To set up Sendgrid, add the Sendgrid environment variables in services/auth/serverless.yml to AWS Parameter Store, similar to Stripe above.
-
-## Published tours
-
-Published tours viewers need to use API key auth instead of Cognito User Pools. In order to set up API key as an additional authorization provider on AppSync, navigate to AppSync -> APIs -> (your API) -> Settings -> Additional authorization providers -> New -> Choose API key -> Submit. Then create a new API key under API keys -> New. By default API keys expire in a week. This can be extended for up to a year by selecting the API key -> Edit -> Expires -> Save.
+| model |         pk         |        gsi1        |             gsi2              |   id    | notes                       |
+| :---- | :----------------: | :----------------: | :---------------------------: | :-----: | :-------------------------- |
+|       |   _hash / range_   |   _range / hash_   |        _type / scope_         |  _id_   |                             |
+| User  | USER-ID / USER-ID  |        n/a         | 'USER' / TRIAL\|GUEST\|TEAM\* | USER-ID |                             |
+| Habit | USER-ID / HABIT-ID | HABIT-ID / USER-ID |      'HABIT' / HABIT-ID       | ORG-ID  | 1 to Many                   |
+| Task  |   TASK-ID / DATE   |        n/a         |  'TASK' / 'USER\|HABIT\|\*'   | TASK-ID | Filter by USER\|HABIT\|DATE |

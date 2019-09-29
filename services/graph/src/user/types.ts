@@ -1,17 +1,14 @@
-export interface IUser {
-  admin: string;
+import { IModel } from '../types';
+
+export interface IUser extends IModel {
   avatar?: {
     bucket: string;
     key: string;
     region: string;
     mimeType: string;
   } | null;
-  createdAt: string;
   email: string;
-  entity: string;
   expiresAt?: number | null;
-  id: string;
-  key: string;
   name?: string | null;
   profile?: {
     address?: {
@@ -28,6 +25,8 @@ export interface IUser {
     title?: string | null;
     website?: string | null;
   } | null;
-  scope: string;
-  updatedAt: string;
+  role?: string | null;
+  source?: string | null;
+  status?: string | null;
+  welcomeSentAt: string | null;
 }

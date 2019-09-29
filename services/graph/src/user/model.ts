@@ -1,13 +1,10 @@
 import { model, Schema } from 'dynamoose';
+import { schema } from '../types';
 import { IUser } from './types';
 
 const UserSchema = new Schema(
   {
-    admin: {
-      default: false,
-      required: true,
-      type: Boolean,
-    },
+    ...schema,
     avatar: {
       default: null,
       map: {
@@ -30,48 +27,18 @@ const UserSchema = new Schema(
       },
       type: Map,
     },
-    confirmedAt: {
-      type: String,
-    },
-    createdAt: {
-      required: true,
-      type: String,
-    },
-    disabled: {
-      default: false,
-      required: true,
-      type: String,
-    },
     email: {
-      required: true,
-      type: String,
-    },
-    entity: {
       required: true,
       type: String,
     },
     expiresAt: {
       type: String,
     },
-    id: {
-      hashKey: true,
-      index: {
-        global: true,
-        rangeKey: 'key',
-      },
-      required: true,
-      type: String,
-    },
-    key: {
-      rangeKey: true,
-      required: true,
-      type: String,
-    },
     name: {
       type: String,
     },
     profile: {
-      default: null,
+      default: {},
       map: {
         address: {
           default: {},
@@ -100,15 +67,6 @@ const UserSchema = new Schema(
           },
           type: Map,
         },
-        email: {
-          type: String,
-        },
-        entity: {
-          type: String,
-        },
-        localAgency: {
-          type: String,
-        },
         phone: {
           type: String,
         },
@@ -121,23 +79,16 @@ const UserSchema = new Schema(
       },
       type: Map,
     },
-    resetAt: {
+    role: {
       type: String,
     },
-    resetToken: {
-      type: String,
-    },
-    scope: {
+    source: {
       type: String,
     },
     status: {
-      default: 'TRIAL',
-      enum: ['EXPIRED', 'GENERAL', 'SUBSCRIBER', 'TRIAL'],
-      required: true,
       type: String,
     },
-    updatedAt: {
-      required: true,
+    welcomeSentAt: {
       type: String,
     },
   },
@@ -146,11 +97,12 @@ const UserSchema = new Schema(
   },
 );
 
-export default model<IUser, { id: string; key: string }>(
-  process.env.TABLE_REFACTOR || 'Refactor',
+export default model<IUser, { hash: string; range: string }>(
+  'USER',
   UserSchema,
   {
     create: true,
+    tableName: process.env.TABLE_REFACTOR || 'Refactor',
     update: true,
   },
 );

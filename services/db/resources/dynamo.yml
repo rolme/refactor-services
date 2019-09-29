@@ -1,63 +1,47 @@
 Resources:
+  DynamoTableAtomicVars:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service}-${self:custom.stage}-AtomicVars
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: varName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: varName
+          KeyType: HASH
+
   DynamoTableRefactor:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: ${self:service}-${self:custom.stage}-Refactor
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: id
+        - AttributeName: hash
           AttributeType: S
-        - AttributeName: key
+        - AttributeName: range
           AttributeType: S
-        - AttributeName: entity
+        - AttributeName: type
           AttributeType: S
         - AttributeName: scope
           AttributeType: S
-        - AttributeName: createdAt
-          AttributeType: N
-        - AttributeName: updatedAt
-          AttributeType: N
       KeySchema:
-        - AttributeName: id
+        - AttributeName: hash
           KeyType: HASH
-        - AttributeName: key
+        - AttributeName: range
           KeyType: RANGE
       GlobalSecondaryIndexes:
-        - IndexName: KeyIdIndex
+        - IndexName: RangeHashIndex
           KeySchema:
-            - AttributeName: key
+            - AttributeName: range
               KeyType: HASH
-            - AttributeName: id
+            - AttributeName: hash
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
-        - IndexName: EntityIdIndex
+        - IndexName: TypeScopeIndex
           KeySchema:
-            - AttributeName: entity
-              KeyType: HASH
-            - AttributeName: id
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
-        - IndexName: entityCreatedAtIndex
-          KeySchema:
-            - AttributeName: entity
-              KeyType: HASH
-            - AttributeName: createdAt
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
-        - IndexName: entityUpdatedAtIndex
-          KeySchema:
-            - AttributeName: entity
-              KeyType: HASH
-            - AttributeName: updatedAt
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
-        - IndexName: EntityScopeIndex
-          KeySchema:
-            - AttributeName: entity
+            - AttributeName: type
               KeyType: HASH
             - AttributeName: scope
               KeyType: RANGE
@@ -65,6 +49,9 @@ Resources:
             ProjectionType: ALL
 
 Outputs:
+  DynamoTableAtomicVars:
+    Value:
+      Ref: DynamoTableAtomicVars
   DynamoTableRefactor:
     Value:
       Ref: DynamoTableRefactor

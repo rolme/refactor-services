@@ -67,18 +67,17 @@ type Habit {
 }
 
 type Mutation {
-  deleteUser: User!
+  deleteUser: User
   updateUser(
+    avatar: S3ObjectInput
     email: String
     name: String
     profile: ProfileInput
-    avatar: S3ObjectInput
   ): User!
 }
 
 type Profile @aws_cognito_user_pools @aws_api_key {
   address: Address
-  email: String
   phone: String
   title: String
   website: String
@@ -93,43 +92,39 @@ type S3Object @aws_cognito_user_pools @aws_api_key {
 }
 
 type User {
-  admin: Boolean!
   avatar: S3Object @aws_cognito_user_pools @aws_api_key
-  confirmedAt: String
   createdAt: String!
-  disabled: Boolean
   email: String!
   expiresAt: String
   habits: [Habit]
   id: ID! @aws_cognito_user_pools @aws_api_key
   name: String @aws_cognito_user_pools @aws_api_key
   profile: Profile @aws_cognito_user_pools @aws_api_key
-  resetAt: String
-  resetToken: String
-  sort: String
+  role: String!
   status: UserStatus!
   tasks: [Task]
   updatedAt: String!
+  welcomeSentAt: String
 }
 
 type Task {
-  habit: Habit!
-  version: String
   completionDate: String
   completed: Boolean
   createdAt: String!
   difficulty: Int
+  habit: Habit!
   rating: Int
   updatedAt: String!
+  version: String
 }
 
 type Query {
-  getUser: User
-  getUsers: [User]
-  getHabit: Habit
-  getHabits: [Habit]
-  getTask: Task
-  getTasks: [Task]
+  getUser: User!
+  getUsers: [User!]!
+  getHabit(id: ID!): Habit
+  getHabits(userId: ID): [Habit!]!
+  getTask(id: ID!): Task
+  getTasks(habitId: ID): [Task!]!
 }
 
 ##### Schema

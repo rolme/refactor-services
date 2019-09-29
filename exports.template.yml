@@ -1,0 +1,35 @@
+# WARNING: DO NOT EDIT TEMPLATE FILE WITHOUT UPDATING
+#    script: bin/exports.sh
+settings: &default
+  awsRegion: storageUploadBucketRegion
+  appSyncApiKey: graphGraphQlApiKeyDefault
+  appSyncApiUrl: graphGraphQlApiUrl
+  cognitoUserPoolId: authUserPool
+  cognitoIdentityPool: authIdentityPool
+  s3DeploymentBucket: storageServerlessDeploymentBucketName
+  s3MediaBucket: storageMediaBucket
+  s3UploadBucket: storageUploadBucket
+
+android:
+  <<: *default
+  cognitoUserPoolClientId: authUserPoolClientAndroid
+
+ios:
+  <<: *default
+  cognitoUserPoolClientId: authUserPoolClientiOS
+
+jest:
+  <<: *default
+  cognitoUserPoolClientId: authUserPoolClientJest
+
+playground:
+  <<: *default
+  cognitoUserPoolClientId: authUserPoolClientPlayground
+
+toolbelt:
+  <<: *default
+  cognitoUserPoolClientId: authUserPoolClientToolbelt
+
+web:
+  <<: *default
+  cognitoUserPoolClientId: authUserPoolClientWeb
