@@ -67,6 +67,17 @@ type Habit {
 }
 
 type Mutation {
+  createHabit(
+    category: String
+    description: String!
+    enableWeekends: Boolean
+    place: String
+    time: String
+    trigger: String
+    userId: ID
+    why: String
+  ): Habit
+  deleteHabit(id: ID!, userId: ID): Habit
   deleteUser: User
   updateUser(
     avatar: S3ObjectInput

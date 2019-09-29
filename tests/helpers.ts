@@ -26,3 +26,24 @@ export async function graphQuery(
 ) {
   return gql(user, query, variables, apiKey);
 }
+
+export async function getHabit() {
+  const habits = await graphQuery('{ getHabits { id description } }');
+
+  const description = 'Automated test habit';
+  if (habits.data.getHabits.length > 0) {
+    const testHabit = habits.data.getHabits.filter(
+      (h: any) => h.description === description,
+    );
+    if (testHabit.length > 0) {
+      return testHabit[0];
+    }
+  }
+
+  const result = await graphQuery(
+    'mutation CreateHabit($description:String!) { createHabit(description:$description) { id description } }',
+    { description },
+  );
+
+  return result.data.createHabit;
+}

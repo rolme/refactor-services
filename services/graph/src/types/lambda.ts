@@ -17,6 +17,7 @@ export type Event<Arguments = {}, Source = {}> = Readonly<{
   context: Readonly<{
     arguments: Arguments;
     identity: Readonly<{
+      claims: { [key: string]: string };
       groups: string[] | null;
       issuer: string;
       sourceIp: string[];
