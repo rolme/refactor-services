@@ -8,6 +8,9 @@ jobs:
     docker:
       # specify the version you desire here
       - image: rolme/node-10-stretch
+        auth:
+          username: rolme
+          password: $DOCKERHUB_PASSWORD
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -49,7 +52,7 @@ jobs:
       - run:
           name: Export to S3 (circleci)
           command: |
-            aws s3 cp exports.yml s3://wps-deployment/exports/circleci/exports.yml
+            aws s3 cp exports.yml s3://refactor-deployment/exports/circleci/exports.yml
 
       - run:
           name: Regression tests (circleci)
