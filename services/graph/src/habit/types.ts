@@ -7,5 +7,6 @@ export interface IHabit extends IModel {
   place?: string;
   time?: string;
   triggger?: string;
+  userId: string;
   why?: string;
 }
