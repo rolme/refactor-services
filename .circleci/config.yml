@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Export to S3 (circleci)
           command: |
-            aws s3 cp exports.yml s3://wps-deployment/exports/circleci/exports.yml
+            aws s3 cp exports.yml s3://refactor-deployment/exports/circleci/exports.yml
 
       - run:
           name: Regression tests (circleci)
