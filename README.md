@@ -1,4 +1,5 @@
 # Refactor Services
+[![CircleCI](https://circleci.com/gh/rolme/refactor-services/tree/master.svg?style=svg)](https://circleci.com/gh/rolme/refactor-services/tree/master)
 
 ## About
 
