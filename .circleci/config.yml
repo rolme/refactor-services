@@ -1,0 +1,70 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: rolme/node-10-stretch
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-yarn-{{ checksum "yarn.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-yarn-
+
+      - run:
+          name: Install serverless and dependencies
+          command: yarn
+
+      - save_cache:
+          key: v1-yarn-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+            - node_modules
+            - services/auth/node_modules
+            - services/db/node_modules
+            - services/graph/node_modules
+            - services/media/node_modules
+            - services/storage/node_modules
+            - tests/node_modules
+
+      - run:
+          name: Deploy services (circleci)
+          command: yarn run deploy -s circleci -v
+
+      - run:
+          name: Export to S3 (circleci)
+          command: |
+            aws s3 cp exports.yml s3://wps-deployment/exports/circleci/exports.yml
+
+      - run:
+          name: Regression tests (circleci)
+          command: yarn run test
+
+      # UNCOMMENT WHEN READY FOR STAGING ENVIRONMENT
+      #  - run:
+      #     name: Deploy services (staging)
+      #     command: yarn run deploy -s staging -v
+
+      # - run:
+      #     name: Export to S3 (staging)
+      #     command: |
+      #       aws s3 cp exports.yml s3://wps-devops/exports/staging/exports.yml
+
+      # - run:
+      #     name: Regression tests (staging)
+      #     command: yarn run test
