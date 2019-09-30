@@ -1,4 +1,5 @@
 # Refactor Services
+[![CircleCI](https://circleci.com/gh/rolme/refactor-services/tree/master.svg?style=svg)](https://circleci.com/gh/rolme/refactor-services/tree/master)
 
 ## About
 
@@ -112,6 +113,12 @@ Examples:
 awslogs groups
 awslogs get /aws/lambda/refactor-auth-STAGE-preSignUp ALL -w
 ````
+
+Another example:
+
+```sh
+cd services/graph && sls logs -t -v -f graphql -s STAGE
+```
 
 ### Tests
 

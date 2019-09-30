@@ -20,6 +20,17 @@ export async function find(event: types.Event<{}>) {
   return user;
 }
 
+export async function findUser(event: types.Event<{}, { userId: string }>) {
+  let id = event.context.source.userId;
+  const user = User.get({ hash: id, range: id });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return user;
+}
+
 export async function update(
   event: types.Event<types.UpdateUserMutationVariables>,
 ) {

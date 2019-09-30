@@ -31,6 +31,7 @@ export async function create(
     range: id,
     scope: id,
     type: 'HABIT',
+    userId,
   });
 
   await habit.save();
@@ -97,6 +98,25 @@ export async function findAll(
       .beginsWith('HABIT-')
       .exec();
   }
+
+  if (!habits) {
+    throw new Error('Could not find habits');
+  }
+
+  return habits;
+}
+
+export async function findAllForUser(
+  event: types.Event<{}, {id: string}>,
+) {
+  const userId = event.context.source.id;
+  let habits: IHabit[];
+
+  habits = await Habit.query('hash')
+    .eq(userId)
+    .where('range')
+    .beginsWith('HABIT-')
+    .exec();
 
   if (!habits) {
     throw new Error('Could not find habits');

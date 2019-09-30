@@ -1,4 +1,4 @@
-import { getHabit, graphQuery } from './helpers';
+import { getHabit, graphQuery, user } from './helpers';
 
 test('Create a habit', async () => {
   const description = 'Automated Test Habit #1';
@@ -10,13 +10,22 @@ test('Create a habit', async () => {
   expect(result.data.createHabit.description).toEqual(description);
 });
 
-test('Get a habit', async () => {
+test('Get a habit with user', async () => {
   const habit = await getHabit();
   const result = await graphQuery(
-    `{ getHabit(id:"${habit.id}") { id description } }`,
+    `{
+      getHabit(id:"${habit.id}") {
+        id
+        description
+        user {
+          id
+        }
+      }
+    }`,
   );
 
   expect(result.data.getHabit.id).toEqual(habit.id);
+  expect(result.data.getHabit.user.id).toEqual(user.id);
 });
 
 test('Delete a habit', async () => {

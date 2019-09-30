@@ -26,6 +26,10 @@ const HabitSchema = new Schema(
     trigger: {
       type: String,
     },
+    userId: {
+      required: true,
+      type: String,
+    },
     why: {
       type: String,
     },

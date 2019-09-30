@@ -1,4 +1,4 @@
-import { graphQuery, user } from './helpers';
+import { graphQuery, getHabit, user } from './helpers';
 
 test('Returns user', async () => {
   const result = await graphQuery(
@@ -8,6 +8,24 @@ test('Returns user', async () => {
   expect(result.data.getUser.id).toEqual(user.id);
   expect(result.data.getUser.email).toEqual(user.email);
   expect(result.data.getUser.updatedAt).toEqual(result.data.getUser.createdAt);
+});
+
+test('Returns user with habits', async () => {
+  const habit = await getHabit();
+  const result = await graphQuery(
+    `{
+      getUser {
+        id
+        email
+        habits {
+          id
+        }
+      }
+    }`,
+  );
+
+  expect(result.data.getUser.id).toEqual(user.id);
+  expect(result.data.getUser.habits[0].id).toEqual(habit.id);
 });
 
 test('Updates name', async () => {

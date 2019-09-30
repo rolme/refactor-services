@@ -128,7 +128,18 @@ custom:
         field: updateUser
         request: updateUser-request.vtl
         response: json-response.vtl
+
       # Nested Resolvers
+      - dataSource: LambdaResolver
+        type: User
+        field: habits
+        request: getHabitsForUser-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Habit
+        field: user
+        request: getUserForHabit-request.vtl
+        response: json-response.vtl
 
 resources:
   - ${file(resources/iam.yml)}

@@ -14,7 +14,9 @@ const resolvers: IResolvers = {
   deleteUser: user.remove,
   getHabit: habit.find,
   getHabits: habit.findAll,
+  getHabitsForUser: habit.findAllForUser,
   getUser: user.find,
+  getUserForHabit: user.findUser,
   getUsers: user.findAll,
   updateUser: user.update,
 };
