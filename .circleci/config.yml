@@ -8,6 +8,9 @@ jobs:
     docker:
       # specify the version you desire here
       - image: rolme/node-10-stretch
+        auth:
+          username: rolme
+          password: $DOCKERHUB_PASSWORD
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
