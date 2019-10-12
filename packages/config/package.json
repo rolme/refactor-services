@@ -1,0 +1,16 @@
+{
+    "name": "@refactor/config",
+    "version": "1.0.0",
+    "description": "Shared Service Configuration",
+    "license": "ISC",
+    "engines": {
+      "node": "10.x"
+    },
+    "devDependencies": {
+      "serverless": "^1.54.0"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.437.0"
+    },
+    "private": true
+}
