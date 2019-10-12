@@ -95,7 +95,7 @@ Example:
 email=Test+1@RefactorDaily.com && \
 aws cognito-idp sign-up \
   --region us-west-2 \
-  --client-id $(sed -n '/^playground:$/,$p' exports.yml | grep "cognitoUserPoolClientId:" | head -1 | xargs | cut -d" " -f2) \
+  --client-id $(sed -n '/^playground:$/,$p' config.yml | grep "cognitoUserPoolClientId:" | head -1 | xargs | cut -d" " -f2) \
   --username $(echo $email | tr '[:upper:]' '[:lower:]') \
   --password refactor123 \
   --user-attributes \
@@ -122,7 +122,7 @@ cd services/graph && sls logs -t -v -f graphql -s STAGE
 
 ### Tests
 
-Run `yarn test` (or just `jest`) to run regression tests against a deployment. The file `exports.yml` must exist, which is created at the end of the deploy script.
+Run `yarn test` (or just `jest`) to run regression tests against a deployment. The file `config.yml` must exist, which is created at the end of the deploy script.
 
 ### DynamoDB Table Design
 

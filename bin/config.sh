@@ -21,8 +21,8 @@ for service in ${services[@]}; do
   done
 done
 
-filepath=$PWD/exports.template.yml
-echo "# exports.yml"
+filepath=$PWD/config.template.yml
+echo "# config.yml"
 echo "# This is auto-generated using the following info. Edit at your own peril..."
 echo "#    command: yarn run deploy $@"
 echo "#    template: $filepath"

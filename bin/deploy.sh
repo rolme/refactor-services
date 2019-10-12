@@ -32,5 +32,5 @@ fi
 # TODO:  modify operations file and save in amplify dir
 # python bin/modify-operations-graphql.py ./services/graph/.serverless/amplify-operations.graphql ./amplify/operations.graphql
 
-# generate exports yml
-bin/exports.sh $@ > exports.yml
+# generate config yml
+bin/config.sh $@ > config.yml
