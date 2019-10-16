@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { ITestUser } from './auth';
 
 const config = yaml.safeLoad(
-  fs.readFileSync(__dirname + '/../../exports.yml', 'utf8'),
+  fs.readFileSync(__dirname + '/../../config.yml', 'utf8'),
 );
 
 export async function gql(

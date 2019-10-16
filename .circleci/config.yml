@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Export to S3 (circleci)
           command: |
-            aws s3 cp exports.yml s3://refactor-deployment/exports/circleci/exports.yml
+            aws s3 cp config.yml s3://refactor-deployment/config/circleci/config.yml
 
       - run:
           name: Regression tests (circleci)
@@ -66,7 +66,7 @@ jobs:
       # - run:
       #     name: Export to S3 (staging)
       #     command: |
-      #       aws s3 cp exports.yml s3://wps-devops/exports/staging/exports.yml
+      #       aws s3 cp config.yml s3://wps-devops/config/staging/config.yml
 
       # - run:
       #     name: Regression tests (staging)

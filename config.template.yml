@@ -1,5 +1,5 @@
 # WARNING: DO NOT EDIT TEMPLATE FILE WITHOUT UPDATING
-#    script: bin/exports.sh
+#    script: bin/config.sh
 settings: &default
   awsRegion: storageUploadBucketRegion
   appSyncApiKey: graphGraphQlApiKeyDefault
@@ -32,4 +32,11 @@ toolbelt:
 
 web:
   <<: *default
+  authCookieDomain: localhost
+  authCookiePath: /
+  authDefaultRedirect: /habits
+  authUrl: 
+  cognitoCredentialsPassword:
+  cognitoCredentialsUsername:
+  cognitoToken:
   cognitoUserPoolClientId: authUserPoolClientWeb

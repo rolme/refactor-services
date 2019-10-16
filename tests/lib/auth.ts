@@ -10,7 +10,7 @@ export interface ITestUser {
 }
 
 export const config = yaml.safeLoad(
-  fs.readFileSync(__dirname + '/../../exports.yml', 'utf8'),
+  fs.readFileSync(__dirname + '/../../config.yml', 'utf8'),
 );
 
 const cognito = new CognitoIdentityServiceProvider({
