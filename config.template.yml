@@ -32,4 +32,11 @@ toolbelt:
 
 web:
   <<: *default
+  authCookieDomain: localhost
+  authCookiePath: /
+  authDefaultRedirect: /habits
+  authUrl: 
+  cognitoCredentialsPassword:
+  cognitoCredentialsUsername:
+  cognitoToken:
   cognitoUserPoolClientId: authUserPoolClientWeb

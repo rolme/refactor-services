@@ -22,7 +22,8 @@ for service in ${services[@]}; do
 done
 
 filepath=$PWD/config.template.yml
-echo "# config.yml"
+now=`date`
+echo "# config.yml - $now"
 echo "# This is auto-generated using the following info. Edit at your own peril..."
 echo "#    command: yarn run deploy $@"
 echo "#    template: $filepath"
@@ -40,7 +41,7 @@ if [[ -f $filepath ]]; then
     fi
 
     key=$(echo "$line" | cut -d" " -f4)
-    if [[ $key =~ ^[a-z] && $key =~ [^:]$ ]]; then
+    if [[ $key =~ ^[a-z] && $key =~ [^:]$ && $map[$key] != '' ]]; then
       echo ${line//$key/$map[$key]}
     else
       echo $line
