@@ -11,6 +11,6 @@ services=(
 )
 
 for service in ${services[@]}; do
-  echo -e "\n=== $service ===\n"
+  echo "\n=== $service ===\n"
   (cd services/$service; serverless info -v $@)
 done

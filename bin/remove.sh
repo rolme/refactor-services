@@ -15,6 +15,6 @@ services=(
 )
 
 for service in ${services[@]}; do
-  echo -e "\n=== Removing $service ===\n"
+  echo "\n=== Removing $service ===\n"
   (cd services/$service; serverless remove $@)
 done

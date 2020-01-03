@@ -15,7 +15,7 @@ services=(
 )
 
 for service in ${services[@]}; do
-  echo -e "\n=== Deploying $service ===\n"
+  printf "\n=== Deploying $service ===\n"
   (cd services/$service; serverless deploy $@)
 done
 
