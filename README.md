@@ -1,4 +1,5 @@
 # Refactor Services
+
 [![CircleCI](https://circleci.com/gh/rolme/refactor-services/tree/master.svg?style=svg&circle-token=85e54e8fc2736fae1df6c637277798de7c505171)](https://circleci.com/gh/rolme/refactor-services/tree/master)
 
 ## About
@@ -16,14 +17,14 @@ This mono-repo contains all backend services.
 
 Clone the repository and enter the project directory:
 
-```
+```sh
 git clone git@github.com:rolme/refactor-services.git
 cd refactor-services
 ```
 
 Install core dependencies and bootstrap the project:
 
-```
+```sh
 yarn
 ```
 
