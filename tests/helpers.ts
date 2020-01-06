@@ -1,4 +1,7 @@
 import { v4 } from 'uuid';
+import { Category } from '../services/graph/src/types';
+import { IHabit } from '../services/graph/src/habit/types';
+// import * as Habit from '../services/graph/src/habit/handler';
 import { createUser, ITestUser, loginUser } from './lib/auth';
 import { gql } from './lib/query';
 
@@ -19,6 +22,9 @@ afterAll(async () => {
   await graphQuery('mutation { deleteUser { id email } }');
 });
 
+////////////////////////////////////////////////////////////////////////////////
+// GRAPH METHODS
+////////////////////////////////////////////////////////////////////////////////
 export async function graphQuery(
   query: string,
   variables?: object,
@@ -27,23 +33,67 @@ export async function graphQuery(
   return gql(user, query, variables, apiKey);
 }
 
-export async function getHabit() {
-  const habits = await graphQuery('{ getHabits { id description } }');
+////////////////////////////////////////////////////////////////////////////////
+// HELPER MODEL METHODS
+////////////////////////////////////////////////////////////////////////////////
+// export async function createHabit(
+//   category: Category = Category.SLEEP,
+//   description: string = 'Automated Test Habit'
+// ) {
+//   const habit = await Habit.create({
+//     category,
+//     description,
+//     userId: user.id || 'USER-test'
+//   });
+//   return habit;
+// }
 
-  const description = 'Automated test habit';
-  if (habits.data.getHabits.length > 0) {
-    const testHabit = habits.data.getHabits.filter(
-      (h: any) => h.description === description,
-    );
-    if (testHabit.length > 0) {
-      return testHabit[0];
-    }
-  }
-
+export async function createHabitMutation(
+  category: Category = Category.SLEEP,
+  description: string = 'Automated Test Habit'
+): Promise<IHabit> {
   const result = await graphQuery(
-    'mutation CreateHabit($description:String!) { createHabit(description:$description) { id description } }',
-    { description },
+    `mutation CreateHabit($category:Category!, $description:String!) {
+      createHabit(
+        category:$category
+        description:$description
+      ) {
+        category
+        description
+        id
+      }
+    }`,
+    {
+      category,
+      description
+    },
+  );
+  return result.data.createHabit;
+}
+
+// export async function getHabit() {
+//   const habits = await Habit.all({});
+//   if (habits.length > 0) { return habits[0] }
+
+//   const habit = await createHabit();
+//   return habit;
+// }
+
+export async function getHabitQuery() {
+  const habits = await graphQuery(
+    `{
+      getHabits(userId:"${user.id}") {
+        category
+        description
+        id
+      }
+    }`
   );
 
-  return result.data.createHabit;
+  if (habits.data.getHabits.length > 0) {
+    return habits.data.getHabits[0];
+  }
+
+  const habit = await createHabitMutation();
+  return habit;
 }
