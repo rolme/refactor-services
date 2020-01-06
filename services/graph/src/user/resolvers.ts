@@ -2,14 +2,30 @@ import { CognitoIdentityServiceProvider, Lambda } from 'aws-sdk';
 import * as validator from 'validator';
 import { S3File } from '../../lib/S3File';
 import Habit from '../habit/model';
-import * as types from '../types';
+import {
+  Event,
+  S3ObjectInput,
+  UpdateUserMutationVariables
+} from '../types';
 import User from './model';
 
 const avatarFileTypes = ['image/jpeg', 'image/jpg'];
 const lambda = new Lambda();
 
-export async function find(event: types.Event<{}>) {
-  const username = `USER-${event.context.identity.sub}`;
+async function get(id: string) {
+  if (!id.startsWith('USER-')) {
+    return;
+  }
+
+  const user = User.get({ hash: id, range: id });
+  return user;
+}
+
+export async function find(event: Event<{}, { userId: string }>) {
+  let username = `USER-${event.context.identity.sub}`;
+  if (event.context.source && event.context.source.userId) {
+    username = event.context.source.userId;
+  }
 
   const user = User.get({ hash: username, range: username });
 
@@ -20,21 +36,11 @@ export async function find(event: types.Event<{}>) {
   return user;
 }
 
-export async function findUser(event: types.Event<{}, { userId: string }>) {
-  let id = event.context.source.userId;
-  const user = User.get({ hash: id, range: id });
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  return user;
-}
-
 export async function update(
-  event: types.Event<types.UpdateUserMutationVariables>,
+  event: Event<UpdateUserMutationVariables>,
 ) {
-  const user = await find(event);
+  let username = `USER-${event.context.identity.sub}`;
+  const user = await get(username);
   if (!user) {
     throw new Error('User not found!');
   }
@@ -81,13 +87,13 @@ export async function update(
   await updateCognitoUser(event.context.identity.sub, attr);
 
   if (Object.keys(updateUser).length) {
-    await User.update({ hash: user.hash, range: user.range }, updateUser);
+    return await User.update({ hash: user.hash, range: user.range }, updateUser);
   }
 
-  return find(event);
+  return user;
 }
 
-export async function findAll() {
+export async function all() {
   const users = User.query('type')
     .eq('USER')
     .using('TypeScopeIndex')
@@ -95,7 +101,7 @@ export async function findAll() {
   return users;
 }
 
-export async function remove(event: types.Event<{}>) {
+export async function destroy(event: Event<{}>) {
   const Username = event.context.identity.sub;
   const UserPoolId = process.env.USER_POOL_ID!;
   const cognito = new CognitoIdentityServiceProvider();
@@ -149,7 +155,7 @@ async function uploadImageFile(
   }
 }
 
-async function validImageFile(file: types.S3ObjectInput) {
+async function validImageFile(file: S3ObjectInput) {
   const s3file = new S3File(file);
 
   // Check if file has been uploaded
