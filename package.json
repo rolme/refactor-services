@@ -1,19 +1,22 @@
 {
-  "private": true,
-  "workspaces": [
-    "services/*",
-    "tests"
-  ],
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "jest": {
+    "testRunner": "jest-circus/runner"
+  },
+  "resolutions": {
+    "jest-cli": "24.9.0"
+  },
   "scripts": {
     "deploy": "bin/deploy.sh",
     "info": "bin/info.sh",
     "remove": "bin/remove.sh",
     "test": "jest --runInBand"
   },
-  "resolutions": {
-    "jest-cli": "24.5.0"
-  },
-  "jest": {
-    "testRunner": "jest-circus/runner"
-  }
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "tests"
+  ]
 }
