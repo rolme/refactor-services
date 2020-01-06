@@ -1,4 +1,8 @@
-import { graphQuery, getHabit, user } from './helpers';
+import {
+  graphQuery,
+  getHabitQuery,
+  user
+} from './helpers';
 
 test('Returns user', async () => {
   const result = await graphQuery(
@@ -11,7 +15,7 @@ test('Returns user', async () => {
 });
 
 test('Returns user with habits', async () => {
-  const habit = await getHabit();
+  const habit = await getHabitQuery();
   const result = await graphQuery(
     `{
       getUser {

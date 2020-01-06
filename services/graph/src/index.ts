@@ -1,7 +1,7 @@
 import * as dynamoose from 'dynamoose';
 
 import * as habit from './habit';
-import * as types from './types';
+import { Event, Context } from './types';
 import * as user from './user';
 
 interface IResolvers {
@@ -10,15 +10,14 @@ interface IResolvers {
 
 const resolvers: IResolvers = {
   createHabit: habit.create,
-  deleteHabit: habit.remove,
-  deleteUser: user.remove,
+  deleteHabit: habit.destroy,
+  deleteUser: user.destroy,
   getHabit: habit.find,
-  getHabits: habit.findAll,
-  getHabitsForUser: habit.findAllForUser,
+  getHabits: habit.all,
   getUser: user.find,
-  getUserForHabit: user.findUser,
-  getUsers: user.findAll,
-  updateUser: user.update,
+  getUsers: user.all,
+  updateHabit: habit.update,
+  updateUser: user.update
 };
 
 dynamoose.setDefaults({
@@ -26,7 +25,7 @@ dynamoose.setDefaults({
   update: false,
 });
 
-export default function(event: types.Event, context: types.Context) {
+export default function(event: Event, context: Context) {
   const resolver = resolvers[event.field];
 
   if (!resolver) {

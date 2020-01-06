@@ -69,9 +69,10 @@ type Habit {
 
 type Mutation {
   createHabit(
-    category: String
+    category: Category!
     description: String!
     enableWeekends: Boolean
+    id: ID
     place: String
     time: String
     trigger: String
@@ -80,6 +81,17 @@ type Mutation {
   ): Habit
   deleteHabit(id: ID!, userId: ID): Habit
   deleteUser: User
+  updateHabit(
+    category: Category
+    description: String
+    enableWeekends: Boolean
+    id: ID!
+    place: String
+    time: String
+    trigger: String
+    userId: String
+    why: String
+  ): Habit!
   updateUser(
     avatar: S3ObjectInput
     email: String

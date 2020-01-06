@@ -8,7 +8,7 @@ provider:
   deploymentBucket:
     name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   region: ${opt:region, 'us-west-2'}
 
 package:

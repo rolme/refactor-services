@@ -1,22 +1,44 @@
 import * as uuid from 'uuid';
-import * as types from '../types';
-import Habit from './model';
-import { IHabit } from './types';
+import {
+  CreateHabitMutationVariables,
+  Event,
+  DeleteHabitMutationVariables,
+  GetHabitQueryVariables,
+  GetHabitsQueryVariables,
+  UpdateHabitMutationVariables
+} from '../types';
+import * as handler from './handler';
+import {
+  IHabit,
+  IHabitCreateParams,
+  IHabitUpdateParams
+} from './types';
 
-export async function create(
-  event: types.Event<{
-    category: string;
-    description: string;
-    enableWeekends: boolean;
-    place: string;
-    time: string;
-    trigger: string;
-    userId: string;
-    why: string;
-  }>,
-) {
-  const id = `HABIT-${uuid.v4()}`;
+export async function all(event: Event<GetHabitsQueryVariables, { userId: string }>) {
+  const role = event.context.identity.claims['custom:role'];
+  let habits: IHabit[];
+
+  if (event.context.arguments.userId && role === 'admin') {
+    const userId = event.context.arguments.userId;
+    habits = await handler.all({ userId })
+  } else if (role === 'admin') {
+    habits = await handler.all({})
+  } else {
+    const userId = `USER-${event.context.identity.sub}`;
+    habits = await handler.all({ userId })
+  }
+
+  if (!habits) {
+    throw new Error('Could not find habits');
+  }
+
+  return habits;
+}
+
+export async function create(event: Event<CreateHabitMutationVariables>) {
   let userId = `USER-${event.context.identity.sub}`;
+  let id = event.context.arguments.id;
+  id = (id) ? id : `HABIT-${uuid.v4()}`;
   if (
     event.context.arguments.userId &&
     event.context.identity.claims['custom:role'] === 'admin'
@@ -24,43 +46,30 @@ export async function create(
     userId = event.context.arguments.userId;
   }
 
-  const habit = new Habit({
+  const params: IHabitCreateParams = {
     ...event.context.arguments,
-    hash: userId,
     id,
-    range: id,
-    scope: id,
-    type: 'HABIT',
-    userId,
-  });
+    userId
+  }
 
-  await habit.save();
+  const habit = await handler.create(params);
   return habit;
 }
 
-export async function find(
-  event: types.Event<{
-    id: string;
-    userId?: string;
-  }>,
-) {
+export async function destroy(event: Event<DeleteHabitMutationVariables>) {
+  const habit = await handler.destroy({ id: event.context.arguments.id });
+  return habit;
+}
+
+export async function find(event: Event<GetHabitQueryVariables, { habitId: string }>) {
   const userId = `USER-${event.context.identity.sub}`;
-  const habitId = event.context.arguments.id;
+  const id = event.context.arguments.id;
   let habit: IHabit;
 
   if (event.context.identity.claims['custom:role'] === 'admin') {
-    habit = await Habit.queryOne('type')
-      .eq('HABIT')
-      .where('scope')
-      .eq(habitId)
-      .using('TypeScopeIndex')
-      .exec();
+    habit = await handler.find({ id })
   } else {
-    habit = await Habit.queryOne('hash')
-      .eq(userId)
-      .where('range')
-      .eq(habitId)
-      .exec();
+    habit = await handler.find({ id, userId })
   }
 
   if (!habit) {
@@ -70,68 +79,27 @@ export async function find(
   return habit;
 }
 
-export async function findAll(
-  event: types.Event<{
-    userId?: string;
-  }>,
-) {
-  const role = event.context.identity.claims['custom:role'];
+export async function update(event: Event<UpdateHabitMutationVariables>) {
   let userId = `USER-${event.context.identity.sub}`;
-  let habits: IHabit[];
+  let id = event.context.arguments.id;
+  id = (id) ? id : `HABIT-${uuid.v4()}`;
 
-  if (event.context.arguments.userId && role === 'admin') {
+  if (
+    event.context.identity.claims['custom:role'] === 'admin' &&
+    event.context.arguments.userId
+  ) {
     userId = event.context.arguments.userId;
-    habits = await Habit.query('hash')
-      .eq(userId)
-      .where('range')
-      .beginsWith('HABIT-')
-      .exec();
-  } else if (role === 'admin') {
-    habits = await Habit.query('type')
-      .eq('HABIT')
-      .using('TypeScopeIndex')
-      .exec();
-  } else {
-    habits = await Habit.query('hash')
-      .eq(userId)
-      .where('range')
-      .beginsWith('HABIT-')
-      .exec();
   }
 
-  if (!habits) {
-    throw new Error('Could not find habits');
+  const params: IHabitUpdateParams = {
+    ...event.context.arguments,
+    id,
+    userId
   }
+  if (!params.userId) { delete params.userId }
 
-  return habits;
-}
-
-export async function findAllForUser(
-  event: types.Event<{}, {id: string}>,
-) {
-  const userId = event.context.source.id;
-  let habits: IHabit[];
-
-  habits = await Habit.query('hash')
-    .eq(userId)
-    .where('range')
-    .beginsWith('HABIT-')
-    .exec();
-
-  if (!habits) {
-    throw new Error('Could not find habits');
-  }
-
-  return habits;
-}
-
-export async function remove(
-  event: types.Event<{
-    id: string;
-  }>,
-) {
-  const habit = await find(event);
-  Habit.delete({ hash: habit.hash, range: habit.range });
-
+  const habit = await handler.update(params);
   return habit;
 }
+  
+  
