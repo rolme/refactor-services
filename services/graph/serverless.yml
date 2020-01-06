@@ -1,6 +1,7 @@
 service: refactor-graph
 
 plugins:
+  - aws-amplify-serverless-plugin
   - serverless-webpack
   - serverless-appsync-plugin
 
@@ -8,7 +9,7 @@ provider:
   deploymentBucket:
     name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   region: ${opt:region, 'us-west-2'}
 
 package:
@@ -125,6 +126,11 @@ custom:
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Mutation
+        field: updateHabit
+        request: updateHabit-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
         field: updateUser
         request: updateUser-request.vtl
         response: json-response.vtl
@@ -133,12 +139,12 @@ custom:
       - dataSource: LambdaResolver
         type: User
         field: habits
-        request: getHabitsForUser-request.vtl
+        request: getHabits-request.vtl
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Habit
         field: user
-        request: getUserForHabit-request.vtl
+        request: getUser-request.vtl
         response: json-response.vtl
 
 resources:
