@@ -35,7 +35,7 @@ custom:
     # Graph types
     - filename: ./src/types/schema.ts
       type: appsync
-      maxDepth: 12
+      maxDepth: 6
 
   appSync:
     name: refactor-${self:custom.stage}
@@ -99,6 +99,16 @@ custom:
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Query
+        field: getTask
+        request: getTask-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Query
+        field: getTasks
+        request: getTasks-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Query
         field: getUser
         request: getUser-request.vtl
         response: json-response.vtl
@@ -116,8 +126,18 @@ custom:
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Mutation
+        field: createTask
+        request: createTask-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
         field: deleteHabit
         request: deleteHabit-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
+        field: deleteTask
+        request: deleteTask-request.vtl
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Mutation
@@ -131,20 +151,35 @@ custom:
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Mutation
+        field: updateTask
+        request: updateTask-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Mutation
         field: updateUser
         request: updateUser-request.vtl
         response: json-response.vtl
 
       # Nested Resolvers
       - dataSource: LambdaResolver
-        type: User
-        field: habits
-        request: getHabits-request.vtl
+        type: Habit
+        field: tasks
+        request: getTasks-request.vtl
         response: json-response.vtl
       - dataSource: LambdaResolver
         type: Habit
         field: user
         request: getUser-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: Task
+        field: habit
+        request: getHabit-request.vtl
+        response: json-response.vtl
+      - dataSource: LambdaResolver
+        type: User
+        field: habits
+        request: getHabits-request.vtl
         response: json-response.vtl
 
 resources:
