@@ -132,4 +132,4 @@ Run `yarn test` (or just `jest`) to run regression tests against a deployment. T
 |       |   _hash / range_   |   _range / hash_   |        _type / scope_         |  _id_   |                             |
 | User  | USER-ID / USER-ID  |        n/a         | 'USER' / TRIAL\|GUEST\|TEAM\* | USER-ID |                             |
 | Habit | USER-ID / HABIT-ID | HABIT-ID / USER-ID |      'HABIT' / HABIT-ID       | ORG-ID  | 1 to Many                   |
-| Task  |   TASK-ID / DATE   |        n/a         |  'TASK' / 'USER\|HABIT\|\*'   | TASK-ID | Filter by USER\|HABIT\|DATE |
+| Task  | TASK-ID / HABIT-ID |        n/a         |  'TASK' / 'HABIT\|\*'         | TASK-ID | Filter by USER\|HABIT\|DATE |
