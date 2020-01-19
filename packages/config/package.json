@@ -7,7 +7,7 @@
       "node": "10.x"
     },
     "devDependencies": {
-      "serverless": "^1.54.0"
+      "serverless": "^1.61.2"
     },
     "dependencies": {
         "aws-sdk": "^2.437.0"
