@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 import { Category } from '../services/graph/src/types';
 import { IHabit } from '../services/graph/src/habit/types';
+import { ITask } from '../services/graph/src/task/types';
 // import * as Habit from '../services/graph/src/habit/handler';
 import { createUser, ITestUser, loginUser } from './lib/auth';
 import { gql } from './lib/query';
@@ -96,4 +97,58 @@ export async function getHabitQuery() {
 
   const habit = await createHabitMutation();
   return habit;
+}
+
+export async function createTaskMutation(
+  completed: boolean = true,
+  completionDate: string = new Date().getUTCDate().toString(),
+): Promise<ITask> {
+  const habit = await getHabitQuery();
+  const result = await graphQuery(
+    `mutation CreateTask(
+      $completed:Boolean!
+      $completionDate:String!
+      $habitId:ID!
+    ) {
+      createTask(
+        completed:$completed
+        completionDate:$completionDate
+        habitId:$habitId
+      ) {
+        completed
+        completionDate
+        id
+        habit {
+          id
+        }
+      }
+    }`,
+    { completed, completionDate, habitId: habit.id }
+  );
+  return result.data.createTask;
+}
+
+export async function getTaskQuery() {
+  const habit = await getHabitQuery();
+  const tasks = await graphQuery(
+    `{
+      getTasks(habitId:"${habit.id}") {
+        completed
+        completionDate
+        difficulty
+        id
+        habit {
+          id
+        }
+        rating
+      }
+    }`
+  );
+
+  if (tasks.data.getTasks.length > 0) {
+    return tasks.data.getTasks[0];
+  }
+
+  const task = await createTaskMutation();
+  return task;
 }

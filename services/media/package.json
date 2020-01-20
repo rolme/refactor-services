@@ -5,6 +5,6 @@
   "description": "Refactor Media Service",
   "license": "ISC",
   "devDependencies": {
-    "serverless": "^1.60.4"
+    "serverless": "1.61.2"
   }
 }

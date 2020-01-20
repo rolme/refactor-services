@@ -63,7 +63,8 @@ export async function destroy(event: Event<DeleteHabitMutationVariables>) {
 
 export async function find(event: Event<GetHabitQueryVariables, { habitId: string }>) {
   const userId = `USER-${event.context.identity.sub}`;
-  const id = event.context.arguments.id;
+  let id = event.context.arguments.id;
+  id = (id) ? id : event.context.source.habitId;
   let habit: IHabit;
 
   if (event.context.identity.claims['custom:role'] === 'admin') {
