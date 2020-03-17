@@ -12,7 +12,7 @@ This mono-repo contains all backend services.
 
 - [node 10+](https://nodejs.org)
 - [yarn](https://yarnpkg.com)
-
+- [github ssh](https://help.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account)
 ### Installation
 
 Clone the repository and enter the project directory:
