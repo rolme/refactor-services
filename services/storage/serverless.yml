@@ -2,7 +2,7 @@ service: refactor-storage
 
 provider:
   deploymentBucket:
-    name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
+    name: ${file(../../config.yml):s3DeploymentBucket, 'refactor-deployment'}
   name: aws
   region: ${opt:region, 'us-west-2'}
 

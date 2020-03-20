@@ -24,13 +24,13 @@ if [[ $SLS_DEBUG ]]; then
 fi
 
 # TODO: generate aws config files
-# bin/awsconfig.py ./services awsconfig
+bin/awsconfig.py ./services awsconfig
 
 # TODO: create amplify dir and copy schema.json
-# bin/amplify.sh
+bin/amplify.sh
 
 # TODO:  modify operations file and save in amplify dir
-# python bin/modify-operations-graphql.py ./services/graph/.serverless/amplify-operations.graphql ./amplify/operations.graphql
+python bin/modify-operations-graphql.py ./services/graph/.serverless/amplify-operations.graphql ./amplify/operations.graphql
 
 # generate config yml
 bin/config.sh $@ > config.yml
