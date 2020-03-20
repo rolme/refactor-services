@@ -2,12 +2,12 @@ service: refactor-graph
 
 plugins:
   - aws-amplify-serverless-plugin
-  - serverless-webpack
   - serverless-appsync-plugin
+  - serverless-webpack
 
 provider:
   deploymentBucket:
-    name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
+    name: ${file(../../config.yml):s3DeploymentBucket, 'refactor-deployment'}
   name: aws
   runtime: nodejs12.x
   region: ${opt:region, 'us-west-2'}
@@ -35,7 +35,19 @@ custom:
     # Graph types
     - filename: ./src/types/schema.ts
       type: appsync
-      maxDepth: 6
+      maxDepth: 4
+
+          # Mobile clients
+    - filename: ./.serverless/amplify-android-awsconfiguration.json
+      type: native
+    - filename: ./.serverless/amplify-ios-awsconfiguration.json
+      type: native
+    - filename: ./.serverless/amplify-operations.graphql
+      type: graphql
+      maxDepth: 4
+    - filename: ./.serverless/amplify-schema.graphql
+      type: schema.json
+      maxDepth: 4
 
   appSync:
     name: refactor-${self:custom.stage}

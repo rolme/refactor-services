@@ -6,7 +6,7 @@ plugins:
 
 provider:
   deploymentBucket:
-    name: ${file(../../config.yml):deploymentBucket, 'refactor-deployment'}
+    name: ${file(../../config.yml):s3DeploymentBucket, 'refactor-deployment'}
   name: aws
   runtime: nodejs12.x
   region: ${opt:region, 'us-west-2'}
