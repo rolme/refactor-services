@@ -34,6 +34,26 @@ Make sure `./node_modules/.bin` is in your path so that the scripts below can fi
 
 Serverless uses the deployment bucket `refactor-deployment`. If you need to change this, copy `confile.yml.example` to `config.yml` and edit the `deploymentBucket` key.
 
+### Install python/pip to use the tools below. On a Mac
+
+1. Install [Homebrew](https://brew.sh/)
+2. brew install python
+
+Homebrew will install python3 and pip3, which you should use instead of system python/pip (ie. pip3 install awscli awslogs).
+
+```sh
+➜  ~ python3 --version
+Python 3.7.2
+```
+
+### Alternatively you can use mini-conda
+
+```sh
+brew install miniconda
+conda create -n wps python=3.6 boto3 awscli awslogs jsonmerge -c nsidc -c conda-forge
+conda activate wps
+```
+
 ## Usage
 
 All scripts are configured in the root package file and can be executed via `yarn run`.
