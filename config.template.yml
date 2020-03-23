@@ -1,5 +1,5 @@
 # WARNING: DO NOT EDIT TEMPLATE FILE WITHOUT UPDATING
-#    script: bin/config.sh
+# script: bin/config.sh
 settings: &default
   awsRegion: storageUploadBucketRegion
   appSyncApiKey: graphGraphQlApiKeyDefault

@@ -22,7 +22,6 @@ usage = "python awsconfig.py <directoryToScan> [outputDirectory]"
 def buildConfig(files):
     awsconfig = json.loads("{}")
     for awsconfigFile in files:
-        print(awsconfigFile)
         with open(awsconfigFile, "r") as jfile:
             jsonOutput = json.load(jfile)
             out = merge(awsconfig, jsonOutput)

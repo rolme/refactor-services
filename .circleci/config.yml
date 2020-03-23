@@ -1,28 +1,23 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
 version: 2
+
 jobs:
   build:
     docker:
-      # specify the version you desire here
       - image: rolme/refactor-image-circleci
         auth:
           username: rolme
           password: $DOCKERHUB_PASSWORD
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
     working_directory: ~/repo
+
+    branches:
+      only:
+        - master
+        - ci
 
     steps:
       - checkout
 
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-yarn-{{ checksum "yarn.lock" }}
@@ -52,22 +47,19 @@ jobs:
       - run:
           name: Export to S3 (circleci)
           command: |
-            aws s3 cp config.yml s3://refactor-deployment/config/circleci/config.yml
+            aws s3 cp exports.yml s3://refactor-deployment/exports/circleci/exports.yml
 
       - run:
           name: Regression tests (circleci)
           command: yarn run test
 
-      # UNCOMMENT WHEN READY FOR STAGING ENVIRONMENT
-      #  - run:
-      #     name: Deploy services (staging)
-      #     command: yarn run deploy -s staging -v
+      - run:
+          name: Deploy services (staging)
+          command: yarn run deploy -s staging -v
 
-      # - run:
-      #     name: Export to S3 (staging)
-      #     command: |
-      #       aws s3 cp config.yml s3://wps-devops/config/staging/config.yml
-
-      # - run:
-      #     name: Regression tests (staging)
-      #     command: yarn run test
+      - run:
+          name: Export to S3 (staging)
+          command: |
+            aws s3 sync awsconfig s3://refactor-deployment/exports/staging/awsconfig --acl bucket-owner-full-control
+            aws s3 sync amplify s3://refactor-deployment/exports/staging/amplify --acl bucket-owner-full-control
+            aws s3 cp exports.yml s3://refactor-deployment/exports/staging/exports.yml --acl bucket-owner-full-control
