@@ -1,1 +1,12 @@
-$utils.toJson($context.result)
+## If there is a datasource invocation error, we choose to raise the same error
+## the field data will be set to null.
+#if($ctx.error)
+  $util.error($ctx.error.message, $ctx.error.type, $ctx.result)
+#end
+
+## If the data source invocation is null, we return null.
+#if($util.isNull($ctx.result))
+  #return
+#end
+
+$util.toJson($ctx.result)
