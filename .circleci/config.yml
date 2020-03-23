@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Export to S3 (circleci)
           command: |
-            aws s3 cp exports.yml s3://refactor-deployment/exports/circleci/exports.yml
+            aws s3 cp config.yml s3://refactor-deployment/config/circleci/config.yml
 
       - run:
           name: Regression tests (circleci)
@@ -60,6 +60,6 @@ jobs:
       - run:
           name: Export to S3 (staging)
           command: |
-            aws s3 sync awsconfig s3://refactor-deployment/exports/staging/awsconfig --acl bucket-owner-full-control
-            aws s3 sync amplify s3://refactor-deployment/exports/staging/amplify --acl bucket-owner-full-control
-            aws s3 cp exports.yml s3://refactor-deployment/exports/staging/exports.yml --acl bucket-owner-full-control
+            aws s3 sync awsconfig s3://refactor-deployment/config/staging/awsconfig --acl bucket-owner-full-control
+            aws s3 sync amplify s3://refactor-deployment/config/staging/amplify --acl bucket-owner-full-control
+            aws s3 cp config.yml s3://refactor-deployment/config/staging/config.yml --acl bucket-owner-full-control
