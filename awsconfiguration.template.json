@@ -1,0 +1,27 @@
+{
+  "AppSync": {
+    "Default": {
+      "ApiUrl": "[ios.appSyncApiUrl]",
+      "AuthMode": "AMAZON_COGNITO_USER_POOLS",
+      "Region": "[ios.awsRegion]"
+    }
+  },
+  "IdentityManager": {
+    "Default": {}
+  },
+  "CredentialsProvider": {
+    "CognitoIdentity": {
+      "Default": {
+        "PoolId": "[ios.cognitoIdentityPool]",
+        "Region": "[ios.awsRegion]"
+      }
+    }
+  },
+  "CognitoUserPool": {
+    "Default": {
+      "PoolId": "[ios.cognitoUserPoolId]",
+      "AppClientId": "[ios.cognitoUserPoolClientId]",
+      "Region": "[ios.awsRegion]"
+    }
+  }
+}
