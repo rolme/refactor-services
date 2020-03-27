@@ -50,8 +50,8 @@ Python 3.7.2
 
 ```sh
 brew install miniconda
-conda create -n wps python=3.6 boto3 awscli awslogs jsonmerge -c nsidc -c conda-forge
-conda activate wps
+conda create -n refactor python=3.6 boto3 awscli awslogs jsonmerge -c nsidc -c conda-forge
+conda activate refactor
 ```
 
 ## Usage
@@ -87,18 +87,6 @@ yarn run remove -s STAGE
 ```
 
 ## Debug
-
-### Install python/pip to use the tools below. On a Mac
-
-1. Install [Homebrew](https://brew.sh/)
-2. brew install python
-
-Homebrew will install python3 and pip3, which you should use instead of system python/pip (ie. pip3 install awscli awslogs).
-
-```sh
-➜  ~ python3 --version
-Python 3.7.2
-```
 
 ### Creating test users
 
