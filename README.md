@@ -49,7 +49,7 @@ Python 3.7.2
 ### Alternatively you can use mini-conda
 
 ```sh
-brew install miniconda
+brew cask install miniconda
 conda create -n refactor python=3.6 boto3 awscli awslogs jsonmerge -c nsidc -c conda-forge
 conda activate refactor
 ```
