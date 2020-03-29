@@ -29,14 +29,11 @@ if [[ $SLS_DEBUG ]]; then
   ls -l services/*/.serverless/amplify*
 fi
 
-# TODO: generate aws config files
-bin/awsconfig.py ./services awsconfig
-
-# TODO: create amplify dir and copy schema.json
-bin/amplify.sh
-
-# TODO:  modify operations file and save in amplify dir
-python bin/modify-operations-graphql.py ./services/graph/.serverless/amplify-operations.graphql ./amplify/operations.graphql
-
-# generate config yml
+# generate config yaml file
 bin/config.sh -s $stage > config.yml
+
+# Generate aws config files
+bin/awsconfig.py
+
+# Generate amplify dir and copy schema.json and operations.graphql
+bin/amplify.py
