@@ -13,6 +13,7 @@ This mono-repo contains all backend services.
 - [node 10+](https://nodejs.org)
 - [yarn](https://yarnpkg.com)
 - [github ssh](https://help.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account)
+
 ### Installation
 
 Clone the repository and enter the project directory:
@@ -50,8 +51,8 @@ Python 3.7.2
 
 ```sh
 brew cask install miniconda
-conda create -n refactor python=3.6 boto3 awscli awslogs jsonmerge -c nsidc -c conda-forge
-conda activate refactor
+conda create -n wps python=3.6 awscli awslogs boto3 graphql-core gql -c nsidc -c conda-forge
+conda activate wps
 ```
 
 ## Usage
@@ -100,7 +101,7 @@ The client-id is the iOS/Android/Web client-id from the user pool. There are a n
 
 Example:
 
-````sh
+```sh
 email=Test+1@RefactorDaily.com && \
 aws cognito-idp sign-up \
   --region us-west-2 \
