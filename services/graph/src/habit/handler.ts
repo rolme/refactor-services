@@ -1,5 +1,6 @@
-import * as uuid from 'uuid';
+import { getId } from '../../lib/id';
 import Habit from './model';
+import { ItemType } from '../types';
 import {
   IHabit,
   IHabitAllParams,
@@ -48,8 +49,8 @@ export async function all(params: IHabitAllParams) {
 }
 
 export async function create(params: IHabitCreateParams) {
-  const id = (params.id) ? params.id : `HABIT-${uuid.v4()}`;
-
+  const id = (params.id) ? params.id : await getId(ItemType.HABIT);
+  console.log(`The value of id is ${id}`)
   const habit = new Habit({
     ...clean(params) as IHabit,
     hash: params.userId,
