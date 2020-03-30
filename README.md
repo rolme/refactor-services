@@ -51,8 +51,8 @@ Python 3.7.2
 
 ```sh
 brew cask install miniconda
-conda create -n wps python=3.6 awscli awslogs boto3 graphql-core gql -c nsidc -c conda-forge
-conda activate wps
+conda create -n refactor python=3.6 awscli awslogs boto3 graphql-core gql -c nsidc -c conda-forge
+conda activate refactor
 ```
 
 ## Usage
