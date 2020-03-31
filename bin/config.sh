@@ -7,7 +7,6 @@ services=(
   db
   auth
   graph
-  media
 )
 
 typeset -A map

@@ -4,7 +4,6 @@ set -e
 
 # auth depends on storage, db
 # graph depends on storage, db, auth
-# media depends on storage, graph
 
 if [[ $2 == "branch" ]]; then
  stage="branch-$RANDOM"
@@ -17,7 +16,6 @@ services=(
   db
   auth
   graph
-  media
 )
 
 for service in ${services[@]}; do
