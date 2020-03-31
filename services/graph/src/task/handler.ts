@@ -1,5 +1,6 @@
-import * as uuid from 'uuid';
+import { getId } from '../../lib/id';
 import Task from './model';
+import { ItemType } from '../types';
 import {
   ITask,
   ITaskAllParams,
@@ -42,7 +43,7 @@ export async function all(params: ITaskAllParams) {
 }
 
 export async function create(params: ITaskCreateParams) {
-  const id = (params.id) ? params.id : `TASK-${uuid.v4()}`;
+  const id = (params.id) ? params.id : await getId(ItemType.TASK);
 
   const task = new Task({
     ...clean(params) as ITask,

@@ -1,4 +1,3 @@
-import * as uuid from 'uuid';
 import {
   CreateTaskMutationVariables,
   Event,
@@ -34,8 +33,7 @@ export async function all(event: Event<GetTasksQueryVariables, { id: string }>) 
 
 // TODO: Work on create and the rest
 export async function create(event: Event<CreateTaskMutationVariables>) {
-  let id = event.context.arguments.id;
-  id = (id) ? id : `TASK-${uuid.v4()}`;
+  let id = event.context.arguments.id || undefined;
 
   const params: ITaskCreateParams = {
     ...event.context.arguments,

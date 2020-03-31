@@ -1,4 +1,3 @@
-import * as uuid from 'uuid';
 import {
   CreateHabitMutationVariables,
   Event,
@@ -37,8 +36,8 @@ export async function all(event: Event<GetHabitsQueryVariables, { userId: string
 
 export async function create(event: Event<CreateHabitMutationVariables>) {
   let userId = `USER-${event.context.identity.sub}`;
-  let id = event.context.arguments.id;
-  id = (id) ? id : `HABIT-${uuid.v4()}`;
+  let id = event.context.arguments.id || undefined;
+
   if (
     event.context.arguments.userId &&
     event.context.identity.claims['custom:role'] === 'admin'
@@ -83,7 +82,6 @@ export async function find(event: Event<GetHabitQueryVariables, { habitId: strin
 export async function update(event: Event<UpdateHabitMutationVariables>) {
   let userId = `USER-${event.context.identity.sub}`;
   let id = event.context.arguments.id;
-  id = (id) ? id : `HABIT-${uuid.v4()}`;
 
   if (
     event.context.identity.claims['custom:role'] === 'admin' &&
