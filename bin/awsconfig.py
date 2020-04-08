@@ -1,69 +1,52 @@
 #!/usr/bin/env python3
 
-from os import listdir
-from os.path import isfile, join
-from os import walk
-import glob, os
+import re
+import os
 import sys
-import json
-from jsonmerge import merge
-#from pprint import pprint
-import traceback
+import yaml
+try:
+  from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+  from yaml import Loader, Dumper
 
-awsconfigFiles = []
+aws_config_dir   = "awsconfig"
+aws_config_file  = 'awsconfiguration.json'
+clients          = ["android", "ios"]
+config_template  = 'awsconfiguration.template.json'
+config_yaml_file = 'config.yml'
 
-mydir = "./services"
-configurationDir = "awsconfig"
-configTypes = ["android", "ios"]
+def parse_template(client, config_yaml):
+  aws_config_data = []
+  with open(config_template, "r") as template:
+    line = template.readline()
+    while line:
+      key = re.findall(r"\[(.*)\]", line)
+      if len(key) > 0:
+        line = line.replace(f"[{key[0]}]", config_yaml[client][key[0]])
+      aws_config_data.append(line.rstrip())
+      line = template.readline()
+    template.close()
 
-usage = "python awsconfig.py <directoryToScan> [outputDirectory]"
+  return aws_config_data
 
-    # Run through the list of configuration files assembling content into one json structure
-def buildConfig(files):
-    awsconfig = json.loads("{}")
-    for awsconfigFile in files:
-        with open(awsconfigFile, "r") as jfile:
-            jsonOutput = json.load(jfile)
-            out = merge(awsconfig, jsonOutput)
-            awsconfig = out
-    return awsconfig
+def generate_aws_config(client, aws_config_data):
+  aws_config_client_dir = os.path.join(aws_config_dir, client)
+  aws_config_fullpath = os.path.join(aws_config_dir, client, aws_config_file)
 
-    # find aws configuration files and create a single file
-def constructAwsConfig(thedir, match, outfile):
-    # find the various configuration files
-    for root, dirs, files in os.walk(thedir):
-        for file in files:
-            if (match in file):
-                awsconfigFiles.append(os.path.join(root, file))
+  os.makedirs(aws_config_client_dir, exist_ok=True)
+  with open(aws_config_fullpath, "w") as awsconfig:
+    awsconfig.write("\n".join(aws_config_data))
+    awsconfig.close()
+  return aws_config_fullpath
 
-        # assemble them into one json object
-    configOutput = buildConfig(awsconfigFiles)
+def main():
+  print ("\n=== Generating AWS configuration ===")
+  config_yaml = yaml.load(open(config_yaml_file, "r"), Loader=Loader)
 
-        # show it
-    #pprint(json.dumps(configOutput, indent=4, sort_keys=True))
+  for client in clients:
+    aws_config_data = parse_template(client, config_yaml)
+    aws_config_fullpath = generate_aws_config(client, aws_config_data)
+    print(f"created {aws_config_fullpath}")
+  print("done")
 
-        # write it
-    with open(outfile, "w") as jfile:
-        jfile.write(json.dumps(configOutput, indent=4, sort_keys=True))
-
-if len(sys.argv) > 1 and sys.argv[1] != None:
-    if "--help" in sys.argv[1]:
-        print(usage)
-        exit()
-
-    mydir = sys.argv[1]
-
-if len(sys.argv) > 2 and sys.argv[2] != None:
-    configurationDir = sys.argv[2]
-
-for configuration in configTypes:
-    outdir = os.path.join(configurationDir, configuration)
-    os.makedirs(outdir, exist_ok=True)
-    try:
-        constructAwsConfig(mydir, configuration+"-awsconfiguration.json", os.path.join(outdir, "awsconfiguration.json"))
-    except BaseException as e:
-        print("Failed to build awsconfig for configuration `"+configuration+"`: "+str(e))
-        traceback.print_exc()
-        exit(1)
-
-print("done")
+main()
