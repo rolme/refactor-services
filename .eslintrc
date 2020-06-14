@@ -1,0 +1,45 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "project": "./tsconfig.json",
+    "sourceType": "module"
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
+  "env": {
+    "browser": false,
+    "node": true
+  },
+  "rules": {
+    "@typescript-eslint/array-type": ["error", { "default": "array-simple", "readonly": "array-simple" }],
+    "@typescript-eslint/camelcase": ["error", { "properties": "always" }],
+    "@typescript-eslint/explicit-function-return-type": ["off"],
+    "@typescript-eslint/interface-name-prefix": ["error", { "prefixWithI": "always" }],
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-var": "error",
+    "object-shorthand": ["error", "always"],
+    "prettier/prettier": [
+      "error",
+      {
+        "extends": ".prettierrc"
+      }
+    ],
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": false,
+        "ignoreDeclarationSort": false,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+      }
+    ],
+    "sort-keys": "error",
+    "sort-vars": "error"
+  }
+}

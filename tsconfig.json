@@ -9,15 +9,13 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "outDir": ".build",
-    "plugins": [
-      { "name": "typescript-tslint-plugin" }
-    ],
     "preserveConstEnums": true,
     "rootDir": "./",
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "es6"
+    "target": "es6",
+    "esModuleInterop": true
   },
   "exclude": ["node_modules"]
 }
