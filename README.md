@@ -10,8 +10,10 @@ This mono-repo contains all backend services.
 
 ### Prerequisites
 
-- [node 10+](https://nodejs.org)
+- [asdf](https://asdf-vm.com/#/core-manage-asdf-vm): single CLI to manage runtime environments like nodejs, python, etc.
+- [node 12+](https://nodejs.org)
 - [yarn](https://yarnpkg.com)
+- [python 3.8](https://www.python.org/downloads/release/python-380/)
 - [github ssh](https://help.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account)
 
 ### Installation
@@ -35,23 +37,40 @@ Make sure `./node_modules/.bin` is in your path so that the scripts below can fi
 
 Serverless uses the deployment bucket `refactor-deployment`. If you need to change this, copy `confile.yml.example` to `config.yml` and edit the `deploymentBucket` key.
 
-### Install python/pip to use the tools below. On a Mac
+### Install python/pip via `asdf`
 
-1. Install [Homebrew](https://brew.sh/)
-2. brew install python
-
-Homebrew will install python3 and pip3, which you should use instead of system python/pip (ie. pip3 install awscli awslogs).
+First you will need [asdf](https://asdf-vm.com/#/core-manage-asdf-vm).
 
 ```sh
-➜  ~ python3 --version
-Python 3.7.2
+brew install coreutils curl git
+brew install asdf
+```
+
+Then update your shell rc file.
+
+```sh
+. $(brew --prefix asdf)/asdf.sh
+```
+
+Add python plugin and set version
+```sh
+asdf plugin add python
+asdf local install 3.8.3
+python --version
+```
+
+Finally, setup your virtual environment within this project's root directory and install packages
+```sh
+python venv ./.venv
+source .venv/bin/activate
+pip awscli awslogs boto3 graphql-core gql
 ```
 
 ### Alternatively you can use mini-conda
 
 ```sh
 brew cask install miniconda
-conda create -n refactor python=3.6 awscli awslogs boto3 graphql-core gql -c nsidc -c conda-forge
+conda create -n refactor python=3.8 awscli awslogs boto3 graphql-core gql -c nsidc -c conda-forge
 conda activate refactor
 ```
 
