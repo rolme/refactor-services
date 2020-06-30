@@ -1,7 +1,5 @@
 # Refactor Services
 
--- [![CircleCI](https://circleci.com/gh/rolme/refactor-services/tree/master.svg?style=svg&circle-token=85e54e8fc2736fae1df6c637277798de7c505171)](https://circleci.com/gh/rolme/refactor-services/tree/master)
-
 ## About
 
 This mono-repo contains all backend services.
