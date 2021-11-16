@@ -11,7 +11,7 @@
     "@types/jest": "^24.0.25",
     "@types/js-yaml": "^3.12.0",
     "@types/node-fetch": "^2.5.0",
-    "aws-sdk": "^2.429.0",
+    "aws-sdk": "^2.814.0",
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
